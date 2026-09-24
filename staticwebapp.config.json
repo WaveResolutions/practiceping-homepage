@@ -1,0 +1,12 @@
+{
+  "routes": [
+    { "route": "/*", "rewrite": "/index.html" }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html"
+  },
+  "globalHeaders": {
+    "X-Frame-Options": "SAMEORIGIN",
+    "X-Content-Type-Options": "nosniff"
+  }
+}

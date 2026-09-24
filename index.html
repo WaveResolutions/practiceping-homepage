@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticePing — Patient Engagement for Medical Practices</title>
+<meta name="description" content="Turn every appointment into a Google review. Re-engage lapsed patients. Fill no-show slots in minutes. HIPAA-compliant. $149/month after 3-month free trial.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --navy:      #0B1F3A;
+  --navy-mid:  #153259;
+  --gold:      #C8922A;
+  --gold-pale: #F5EDD9;
+  --ground:    #EEF1F7;
+  --surface:   #FFFFFF;
+  --border:    #D4DAE8;
+  --text:      #1C2B3A;
+  --muted:     #5A6E88;
+  --green:     #15803D;
+  --green-bg:  #DCFCE7;
+  --green-text:#14532D;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:    #080F1C;
+    --surface:   #0D1E35;
+    --border:    #1B3054;
+    --text:      #D8E5F5;
+    --muted:     #7A9ABF;
+    --gold-pale: #1E1508;
+    --green-bg:  #042010;
+    --green-text:#4ADE80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground:    #080F1C;
+  --surface:   #0D1E35;
+  --border:    #1B3054;
+  --text:      #D8E5F5;
+  --muted:     #7A9ABF;
+  --gold-pale: #1E1508;
+  --green-bg:  #042010;
+  --green-text:#4ADE80;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+body {
+  background: var(--ground);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 24px; }
+nav {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 100;
+  background: transparent;
+  transition: background .25s, box-shadow .25s;
+  padding: 0;
+}
+nav.scrolled {
+  background: rgba(11,31,58,.96);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 0 rgba(255,255,255,.06);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 60px; }
+.nav-brand { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; color: #fff; letter-spacing: -.3px; }
+.nav-brand span { color: var(--gold); }
+.nav-links { display: flex; gap: 28px; font-size: 14px; font-weight: 500; color: rgba(255,255,255,.7); }
+.nav-links a:hover { color: #fff; }
+.nav-cta { background: var(--gold); color: #fff; font-size: 13.5px; font-weight: 600; padding: 8px 18px; border-radius: 5px; white-space: nowrap; transition: opacity .15s; }
+.nav-cta:hover { opacity: .88; }
+@media (max-width: 600px) { .nav-links { display: none; } }
+.hero { background: var(--navy); padding-block: 80px 72px; position: relative; overflow: hidden; }
+.hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 70% 50%, rgba(200,146,42,.07) 0%, transparent 70%); pointer-events: none; }
+.hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+@media (max-width: 860px) { .hero-grid { grid-template-columns: 1fr; gap: 48px; } }
+.hero-eyebrow { font-size: 11.5px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 18px; }
+.hero h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(40px, 5.5vw, 62px); font-weight: 500; line-height: 1.12; color: #fff; text-wrap: balance; margin-bottom: 22px; letter-spacing: -.5px; }
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero-sub { font-size: 16.5px; line-height: 1.72; color: rgba(255,255,255,.62); max-width: 440px; margin-bottom: 36px; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+.btn-primary { background: var(--gold); color: #fff; font-weight: 600; font-size: 15px; padding: 13px 26px; border-radius: 6px; transition: opacity .15s; display: inline-block; }
+.btn-primary:hover { opacity: .88; }
+.btn-ghost { color: rgba(255,255,255,.65); font-size: 15px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,.2); padding-bottom: 1px; transition: color .15s; }
+.btn-ghost:hover { color: #fff; }
+.hero-note { font-size: 12.5px; color: rgba(255,255,255,.32); }
+.demo-widget { background: var(--surface); border-radius: 10px; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.06); position: relative; z-index: 1; }
+.dw-header { background: var(--navy); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.07); }
+.dw-title { font-size: 13px; font-weight: 600; color: #fff; }
+.dw-date { font-size: 11.5px; color: rgba(255,255,255,.4); }
+.dw-stats { display: flex; gap: 0; background: var(--gold-pale); border-bottom: 1px solid var(--border); }
+.dw-stat { flex: 1; padding: 10px 14px; text-align: center; border-right: 1px solid var(--border); }
+.dw-stat:last-child { border-right: none; }
+.dw-stat-num { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--navy); display: block; line-height: 1; font-variant-numeric: tabular-nums; }
+.dw-stat-label { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+.dw-actions { padding: 10px 14px; display: flex; gap: 8px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.dw-btn-all { background: var(--navy); color: #fff; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 4px; border: none; cursor: pointer; transition: opacity .15s; font-family: inherit; }
+.dw-btn-all:hover { opacity: .85; }
+.dw-btn-all:disabled { opacity: .45; cursor: default; }
+.dw-patients { padding: 8px 0; }
+.dw-patient { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid var(--border); transition: background .2s; }
+.dw-patient:last-child { border-bottom: none; }
+.dw-patient.sent { background: var(--green-bg); }
+.dw-ava { width: 30px; height: 30px; border-radius: 50%; background: var(--gold-pale); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--navy); flex-shrink: 0; transition: background .3s; }
+.dw-patient.sent .dw-ava { background: var(--green-bg); color: var(--green); }
+.dw-info { flex: 1; min-width: 0; }
+.dw-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.dw-appt { font-size: 11.5px; color: var(--muted); }
+.dw-send { font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 4px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; white-space: nowrap; transition: all .15s; font-family: inherit; flex-shrink: 0; }
+.dw-send:hover { border-color: var(--gold); color: var(--gold); }
+.dw-send.sent-state { background: var(--green-bg); border-color: var(--green); color: var(--green-text); cursor: default; }
+.problem { background: var(--surface); padding-block: 64px; border-bottom: 1px solid var(--border); }
+.problem-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
+@media (max-width: 700px) { .problem-grid { grid-template-columns: 1fr; } }
+.problem-item { padding: 0 40px; border-right: 1px solid var(--border); }
+.problem-item:first-child { padding-left: 0; }
+.problem-item:last-child  { padding-right: 0; border-right: none; }
+@media (max-width: 700px) { .problem-item { padding: 28px 0; border-right: none; border-bottom: 1px solid var(--border); } .problem-item:last-child { border-bottom: none; } }
+.problem-num { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 64px; font-weight: 500; color: var(--navy); line-height: 1; margin-bottom: 10px; letter-spacing: -1px; display: block; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .problem-num { color: var(--text); } }
+:root[data-theme="dark"] .problem-num { color: var(--text); }
+.problem-text { font-size: 15px; line-height: 1.65; color: var(--muted); max-width: 260px; }
+.problem-text strong { color: var(--text); font-weight: 600; }
+.feat { padding-block: 88px; }
+.feat.alt { background: var(--ground); }
+.feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+.feat-grid.flip { direction: rtl; }
+.feat-grid.flip > * { direction: ltr; }
+@media (max-width: 840px) { .feat-grid, .feat-grid.flip { grid-template-columns: 1fr; direction: ltr; gap: 44px; } }
+.feat-eyebrow { font-size: 11px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 14px; }
+.feat h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(30px, 3.5vw, 42px); font-weight: 500; line-height: 1.18; color: var(--text); text-wrap: balance; margin-bottom: 18px; letter-spacing: -.3px; }
+.feat h2 em { font-style: italic; color: var(--gold); }
+.feat p { font-size: 16px; line-height: 1.78; color: var(--muted); margin-bottom: 24px; max-width: 440px; }
+.feat-bullets { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.feat-bullets li { display: flex; gap: 10px; font-size: 14.5px; color: var(--text); }
+.feat-bullets li::before { content: '→'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+.ui-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: 0 8px 32px rgba(11,31,58,.08); }
+.up-head { background: var(--navy); padding: 12px 16px; font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.85); display: flex; align-items: center; gap: 8px; }
+.up-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); }
+.lapsed-list { padding: 8px 0; }
+.lapsed-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.lapsed-row:last-child { border-bottom: none; }
+.lapsed-ava { width: 32px; height: 32px; border-radius: 50%; background: var(--ground); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+.lapsed-info { flex: 1; min-width: 0; }
+.lapsed-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.lapsed-since { font-size: 11.5px; color: var(--muted); }
+.lapsed-badge { font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 20px; background: #FEF9C3; color: #854D0E; white-space: nowrap; }
+.slot-panel { padding: 16px; }
+.slot-open { background: var(--gold-pale); border: 1.5px solid var(--gold); border-radius: 7px; padding: 14px; margin-bottom: 12px; }
+.slot-time { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .slot-time { color: var(--text); } }
+:root[data-theme="dark"] .slot-time { color: var(--text); }
+.slot-detail { font-size: 12.5px; color: var(--muted); }
+.slot-label { font-size: 11px; letter-spacing: .8px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 8px; }
+.notif-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; background: var(--surface); }
+.notif-row:last-child { margin-bottom: 0; }
+.notif-icon { font-size: 16px; flex-shrink: 0; }
+.notif-text { font-size: 12.5px; color: var(--text); }
+.notif-text strong { font-weight: 600; }
+.notif-status { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--green); background: var(--green-bg); padding: 2px 8px; border-radius: 20px; flex-shrink: 0; }
+.how { background: var(--navy); padding-block: 80px; }
+.how-head { text-align: center; margin-bottom: 56px; }
+.how-eyebrow { font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 12px; }
+.how h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(30px, 4vw, 46px); font-weight: 500; color: #fff; letter-spacing: -.4px; line-height: 1.15; }
+.steps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; position: relative; }
+@media (max-width: 700px) { .steps { grid-template-columns: 1fr; } }
+.steps::before { content: ''; position: absolute; top: 32px; left: calc(100% / 6); right: calc(100% / 6); height: 1px; background: rgba(255,255,255,.12); }
+@media (max-width: 700px) { .steps::before { display: none; } }
+.step { padding: 0 32px; text-align: center; }
+.step:first-child { padding-left: 0; }
+.step:last-child  { padding-right: 0; }
+@media (max-width: 700px) { .step { padding: 0; margin-bottom: 40px; text-align: left; } }
+.step-num { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 500; color: var(--gold); line-height: 1; margin-bottom: 16px; display: block; }
+.step h3 { font-size: 17px; font-weight: 600; color: #fff; margin-bottom: 10px; }
+.step p { font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,.5); max-width: 220px; margin: 0 auto; }
+@media (max-width: 700px) { .step p { margin: 0; } }
+.pricing { background: var(--surface); padding-block: 80px; }
+.pricing-head { text-align: center; margin-bottom: 48px; }
+.pricing-eyebrow { font-size: 11px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 12px; }
+.pricing h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(30px, 4vw, 46px); font-weight: 500; color: var(--text); letter-spacing: -.4px; }
+.pricing-layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: 40px; align-items: start; }
+@media (max-width: 800px) { .pricing-layout { grid-template-columns: 1fr; } }
+.price-card { border: 2px solid var(--navy); border-radius: 10px; overflow: hidden; }
+.pc-head { background: var(--navy); padding: 24px 28px; }
+.pc-plan { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 4px; }
+.pc-amount { font-family: 'Cormorant Garamond', serif; font-size: 54px; font-weight: 600; color: var(--gold); line-height: 1; letter-spacing: -1px; }
+.pc-per { font-size: 14px; color: rgba(255,255,255,.4); margin-top: 4px; }
+.pc-trial { background: var(--green-bg); padding: 10px 28px; font-size: 13px; font-weight: 600; color: var(--green-text); display: flex; align-items: center; gap: 8px; }
+.pc-features { padding: 20px 28px; display: flex; flex-direction: column; gap: 11px; }
+.pc-feat { display: flex; gap: 10px; font-size: 14px; color: var(--text); }
+.pc-feat::before { content: '✓'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+.compare-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+.comp-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.comp-table thead th { background: var(--navy); color: rgba(255,255,255,.8); padding: 10px 16px; text-align: left; font-weight: 600; font-size: 12px; letter-spacing: .2px; }
+.comp-table tbody tr { border-bottom: 1px solid var(--border); }
+.comp-table tbody tr:last-child { border-bottom: none; }
+.comp-table tbody td { padding: 11px 16px; vertical-align: middle; }
+.comp-table tbody tr.ours { background: var(--gold-pale); }
+.comp-name { font-weight: 600; color: var(--text); }
+.comp-price { font-variant-numeric: tabular-nums; font-weight: 600; }
+.comp-price.high { color: #B91C1C; }
+.comp-price.ours { color: var(--green); }
+.comp-trial { font-size: 12.5px; color: var(--muted); }
+.comp-trial.good { color: var(--green); font-weight: 600; }
+.cta-section { background: var(--navy); padding-block: 88px; border-top: 1px solid rgba(255,255,255,.05); }
+.cta-inner { text-align: center; max-width: 600px; margin: 0 auto; }
+.cta-section h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(32px, 5vw, 52px); font-weight: 500; color: #fff; line-height: 1.18; text-wrap: balance; margin-bottom: 14px; letter-spacing: -.4px; }
+.cta-section h2 em { color: var(--gold); font-style: italic; }
+.cta-sub { font-size: 16px; color: rgba(255,255,255,.5); margin-bottom: 36px; }
+.cta-form { display: flex; gap: 10px; max-width: 420px; margin: 0 auto 14px; flex-wrap: wrap; }
+.cta-input { flex: 1; min-width: 200px; padding: 13px 16px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); color: #fff; font-size: 15px; font-family: inherit; outline: none; transition: border .15s; }
+.cta-input::placeholder { color: rgba(255,255,255,.3); }
+.cta-input:focus { border-color: var(--gold); }
+.cta-submit { background: var(--gold); color: #fff; font-weight: 600; font-size: 15px; padding: 13px 22px; border-radius: 6px; border: none; cursor: pointer; font-family: inherit; transition: opacity .15s; white-space: nowrap; }
+.cta-submit:hover { opacity: .88; }
+.cta-note { font-size: 12.5px; color: rgba(255,255,255,.28); }
+.cta-sent { color: var(--gold); font-size: 14px; font-weight: 500; display: none; }
+footer { background: #060F1C; padding-block: 32px; }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.footer-brand { font-weight: 700; font-size: 16px; color: rgba(255,255,255,.7); }
+.footer-brand span { color: var(--gold); }
+.footer-copy { font-size: 12.5px; color: rgba(255,255,255,.25); }
+.footer-links { display: flex; gap: 20px; font-size: 13px; color: rgba(255,255,255,.4); }
+.footer-links a:hover { color: rgba(255,255,255,.7); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="wrap">
+    <div class="nav-inner">
+      <div class="nav-brand">Practice<span>Ping</span></div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <a href="#cta" class="nav-cta">Start Free Trial</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <p class="hero-eyebrow">Patient Engagement · Medical Practices</p>
+        <h1>Turn today's appointments into <em>tomorrow's reviews.</em></h1>
+        <p class="hero-sub">Send personalized review requests after every visit. Re-engage patients who've gone quiet. Fill no-show slots before they cost you. All from one place.</p>
+        <div class="hero-actions">
+          <a href="#cta" class="btn-primary">Start 3-Month Free Trial</a>
+          <a href="#how" class="btn-ghost">See how it works ↓</a>
+        </div>
+        <p class="hero-note">No credit card required &nbsp;·&nbsp; Cancel anytime</p>
+      </div>
+      <div class="demo-widget" id="demoWidget">
+        <div class="dw-header">
+          <span class="dw-title">Today's Schedule</span>
+          <span class="dw-date" id="demoDate"></span>
+        </div>
+        <div class="dw-stats">
+          <div class="dw-stat"><span class="dw-stat-num" id="statTotal">8</span><span class="dw-stat-label">Patients</span></div>
+          <div class="dw-stat"><span class="dw-stat-num" id="statSent">0</span><span class="dw-stat-label">Sent</span></div>
+          <div class="dw-stat"><span class="dw-stat-num" id="statPending">8</span><span class="dw-stat-label">Pending</span></div>
+        </div>
+        <div class="dw-actions">
+          <button class="dw-btn-all" id="sendAllBtn" onclick="sendAll()">Send All Review Requests</button>
+        </div>
+        <div class="dw-patients" id="patientList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="problem">
+  <div class="wrap">
+    <div class="problem-grid">
+      <div class="problem-item">
+        <span class="problem-num">63%</span>
+        <p class="problem-text"><strong>of patients never leave a review</strong> — even after a visit they were happy with. They meant to. They forgot.</p>
+      </div>
+      <div class="problem-item">
+        <span class="problem-num">25%</span>
+        <p class="problem-text"><strong>of active patients haven't been seen in over a year.</strong> They didn't leave your practice. They just drifted.</p>
+      </div>
+      <div class="problem-item">
+        <span class="problem-num">$400+</span>
+        <p class="problem-text"><strong>lost every time a no-show slot goes unfilled.</strong> You have a waitlist. They just don't know there's an opening.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="features">
+
+<section class="feat">
+  <div class="wrap">
+    <div class="feat-grid">
+      <div>
+        <p class="feat-eyebrow">Review Outreach</p>
+        <h2>Every patient visit is a review you <em>haven't asked for yet.</em></h2>
+        <p>After each appointment, PracticePing sends a personalized SMS or email — from your practice's own domain — with one tap to your Google review page. Warm, brief, or personal templates. You choose what goes out.</p>
+        <ul class="feat-bullets">
+          <li>Emails sent from <em>reviews@yourdomain.com</em> — not a generic platform address</li>
+          <li>Three message tones: warm, brief, personal</li>
+          <li>Bulk-send all eligible patients at once, or one at a time</li>
+          <li>HIPAA-validated — no patient health data in messages</li>
+        </ul>
+      </div>
+      <div class="demo-widget" style="box-shadow:0 8px 32px rgba(11,31,58,.1);">
+        <div class="dw-header"><span class="dw-title">Compose Message</span><span class="dw-date">Patient: Sarah M.</span></div>
+        <div style="padding:16px;border-bottom:1px solid var(--border);background:var(--surface);">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;">Template</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="background:var(--navy);color:#fff;font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;">Warm</span>
+            <span style="border:1px solid var(--border);font-size:12px;padding:5px 12px;border-radius:20px;color:var(--muted);">Brief</span>
+            <span style="border:1px solid var(--border);font-size:12px;padding:5px 12px;border-radius:20px;color:var(--muted);">Personal</span>
+          </div>
+        </div>
+        <div style="padding:16px;background:var(--surface);border-bottom:1px solid var(--border);">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px;">Message Preview</div>
+          <div style="background:var(--ground);border-radius:6px;padding:12px;font-size:13.5px;color:var(--text);line-height:1.65;">
+            Hi Sarah! We hope your visit went well today. If you have a moment, a quick Google review would mean the world to us — it helps others in the community find great care.<br><br>
+            <span style="color:var(--gold);font-weight:600;">→ Leave a review</span>
+          </div>
+        </div>
+        <div style="padding:12px 16px;background:var(--surface);display:flex;gap:10px;justify-content:flex-end;">
+          <span style="font-size:12.5px;color:var(--muted);align-self:center;">Sending from: reviews@yourdomain.com</span>
+          <button style="background:var(--navy);color:#fff;border:none;padding:8px 18px;border-radius:5px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">Send ✓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="feat alt">
+  <div class="wrap">
+    <div class="feat-grid flip">
+      <div>
+        <p class="feat-eyebrow">Lapsed Patient Recovery</p>
+        <h2>Your best patients stopped coming. <em>Here's how to bring them back.</em></h2>
+        <p>PracticePing identifies patients who haven't visited in 12 or more months and sends a warm, personal re-engagement message. No cold outreach — these are patients who already trust your practice.</p>
+        <ul class="feat-bullets">
+          <li>Automatically flags patients lapsed 12, 18, or 24+ months</li>
+          <li>Sends via SMS or email — whichever they have on file</li>
+          <li>Tracks re-engagement status: contacted, booked, opted out</li>
+          <li>Bulk or individual outreach</li>
+        </ul>
+      </div>
+      <div class="ui-panel">
+        <div class="up-head"><span class="up-dot"></span> Lapsed Patients — Last 18 Months</div>
+        <div class="lapsed-list">
+          <div class="lapsed-row"><div class="lapsed-ava">RM</div><div class="lapsed-info"><div class="lapsed-name">Robert Martinez</div><div class="lapsed-since">Last visit: 14 months ago</div></div><span class="lapsed-badge">14 mo</span></div>
+          <div class="lapsed-row"><div class="lapsed-ava">JK</div><div class="lapsed-info"><div class="lapsed-name">Janet Kim</div><div class="lapsed-since">Last visit: 19 months ago</div></div><span class="lapsed-badge" style="background:#FEE2E2;color:#991B1B;">19 mo</span></div>
+          <div class="lapsed-row"><div class="lapsed-ava">DP</div><div class="lapsed-info"><div class="lapsed-name">David Patel</div><div class="lapsed-since">Last visit: 22 months ago</div></div><span class="lapsed-badge" style="background:#FEE2E2;color:#991B1B;">22 mo</span></div>
+          <div class="lapsed-row" style="background:var(--green-bg);"><div class="lapsed-ava" style="background:var(--green-bg);color:var(--green);">AL</div><div class="lapsed-info"><div class="lapsed-name">Amara Lewis</div><div class="lapsed-since">Re-engaged · Booked for Oct 3</div></div><span class="lapsed-badge" style="background:var(--green-bg);color:var(--green-text);">Booked ✓</span></div>
+          <div class="lapsed-row"><div class="lapsed-ava">TN</div><div class="lapsed-info"><div class="lapsed-name">Thomas Nguyen</div><div class="lapsed-since">Last visit: 16 months ago</div></div><span class="lapsed-badge">16 mo</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="feat">
+  <div class="wrap">
+    <div class="feat-grid">
+      <div>
+        <p class="feat-eyebrow">No-Show Slot Recovery</p>
+        <h2>A cancelled appointment <em>doesn't have to mean an empty slot.</em></h2>
+        <p>When a patient cancels, PracticePing immediately notifies patients on your waitlist. They respond, you confirm, and the slot fills — often within the hour. No phone calls needed.</p>
+        <ul class="feat-bullets">
+          <li>Instant SMS notification to waitlist patients when a slot opens</li>
+          <li>Patient replies YES to claim — you confirm from the dashboard</li>
+          <li>Tracks fill rate and estimated revenue recovered</li>
+          <li>Works alongside your existing scheduling system</li>
+        </ul>
+      </div>
+      <div class="ui-panel">
+        <div class="up-head"><span class="up-dot"></span> Slot Recovery — Today</div>
+        <div class="slot-panel">
+          <div class="slot-open">
+            <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--gold);font-weight:700;margin-bottom:6px;">Slot Just Opened</div>
+            <div class="slot-time">2:30 PM</div>
+            <div class="slot-detail">45 min · Dr. Reeves · Internal Medicine</div>
+          </div>
+          <div class="slot-label">Waitlist Notified</div>
+          <div class="notif-row"><span class="notif-icon">📱</span><div class="notif-text"><strong>Michael T.</strong> — "A 2:30 PM slot just opened..."</div><span class="notif-status">Sent</span></div>
+          <div class="notif-row"><span class="notif-icon">📱</span><div class="notif-text"><strong>Grace O.</strong> — "A 2:30 PM slot just opened..."</div><span class="notif-status">Sent</span></div>
+          <div class="notif-row" style="background:var(--green-bg);border-color:var(--green);"><span class="notif-icon">✅</span><div class="notif-text"><strong>Michael T.</strong> replied YES — slot claimed</div><span class="notif-status">Booked</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="how-head">
+      <p class="how-eyebrow">Getting Started</p>
+      <h2>Most practices are live within a few days of signing up.</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="step-num">01</span><h3>Import your schedule</h3><p>Export today's appointments from athenahealth as a CSV. Upload it in seconds. No API access needed.</p></div>
+      <div class="step"><span class="step-num">02</span><h3>Send in one click</h3><p>Send review requests to all eligible patients at once — or message them individually with a custom template.</p></div>
+      <div class="step"><span class="step-num">03</span><h3>Watch reviews grow</h3><p>Patients receive a message from your own practice domain. One tap to your Google page. Done.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <div class="pricing-head">
+      <p class="pricing-eyebrow">Pricing</p>
+      <h2>One plan. Everything included.</h2>
+    </div>
+    <div class="pricing-layout">
+      <div class="price-card">
+        <div class="pc-head">
+          <div class="pc-plan">Professional</div>
+          <div class="pc-amount">$149</div>
+          <div class="pc-per">per month after 3-month trial</div>
+        </div>
+        <div class="pc-trial">🎁 &nbsp;3 months free · No credit card required</div>
+        <div class="pc-features">
+          <div class="pc-feat">Unlimited patient outreach</div>
+          <div class="pc-feat">Review request SMS &amp; email</div>
+          <div class="pc-feat">Lapsed patient re-engagement</div>
+          <div class="pc-feat">No-show slot recovery</div>
+          <div class="pc-feat">Branded emails from your domain</div>
+          <div class="pc-feat">HIPAA-compliant messaging</div>
+          <div class="pc-feat">Appointment request portal</div>
+          <div class="pc-feat">Auto chart note logging</div>
+          <div class="pc-feat">Analytics dashboard</div>
+          <div class="pc-feat">Custom feature requests</div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:14px;color:var(--muted);margin-bottom:16px;font-weight:500;">What other platforms charge — for fewer features:</p>
+        <div class="compare-wrap">
+          <table class="comp-table">
+            <thead><tr><th>Platform</th><th>Monthly</th><th>Covers</th><th>Trial</th></tr></thead>
+            <tbody>
+              <tr><td><span class="comp-name">Podium</span></td><td><span class="comp-price high">$399–$599</span></td><td style="font-size:12.5px;color:var(--muted);">Reviews + messaging</td><td><span class="comp-trial">14 days</span></td></tr>
+              <tr><td><span class="comp-name">Birdeye</span></td><td><span class="comp-price high">$299–$499</span></td><td style="font-size:12.5px;color:var(--muted);">Reviews + reputation</td><td><span class="comp-trial">Demo only</span></td></tr>
+              <tr><td><span class="comp-name">Solutionreach</span></td><td><span class="comp-price high">$329</span></td><td style="font-size:12.5px;color:var(--muted);">Healthcare reviews</td><td><span class="comp-trial">Demo only</span></td></tr>
+              <tr><td><span class="comp-name">PatientPop</span></td><td><span class="comp-price high">$299–$499</span></td><td style="font-size:12.5px;color:var(--muted);">Healthcare reviews</td><td><span class="comp-trial">Demo only</span></td></tr>
+              <tr><td><span class="comp-name">Weave</span></td><td><span class="comp-price high">$400–$600</span></td><td style="font-size:12.5px;color:var(--muted);">All-in-one</td><td><span class="comp-trial">30 days</span></td></tr>
+              <tr class="ours"><td><span class="comp-name">★ PracticePing</span></td><td><span class="comp-price ours">$149</span></td><td style="font-size:12.5px;color:var(--text);font-weight:600;">Full platform + custom</td><td><span class="comp-trial good">3 months free</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;font-style:italic;">Competitor pricing based on publicly listed rates, September 2026.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section" id="cta">
+  <div class="wrap">
+    <div class="cta-inner">
+      <h2>Ready to see PracticePing <em>in action?</em></h2>
+      <p class="cta-sub">Start your 3-month free trial today. We'll have you set up and sending review requests within a few days.</p>
+      <form class="cta-form" onsubmit="submitCTA(event)">
+        <input class="cta-input" id="ctaEmail" type="email" placeholder="your@practice.com" required>
+        <button class="cta-submit" type="submit">Get Started Free</button>
+      </form>
+      <p class="cta-note" id="ctaNote">No credit card · No contract · Cancel anytime</p>
+      <p class="cta-sent" id="ctaSent">✓ Got it — we'll be in touch within 24 hours.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Practice<span>Ping</span></div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="mailto:info@waveresolutions.com">Contact</a>
+      </div>
+      <div class="footer-copy">© 2026 WaveResolutions LLC · info@waveresolutions.com</div>
+    </div>
+  </div>
+</footer>
+
+<script>(function(){var _d=new Date();var _m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];document.getElementById('demoDate').textContent=_m[_d.getMonth()]+' '+_d.getDate()+', '+_d.getFullYear();var _e=document.getElementById('nav');window.addEventListener('scroll',function(){_e.classList.toggle('scrolled',window.scrollY>40)},{passive:true});_e.classList.toggle('scrolled',window.scrollY>40);var _x=[{id:'x1',initials:'SJ',name:'Sarah Johnson',appt:'9:00 AM · Annual Physical'},{id:'x2',initials:'MR',name:'Michael Rivera',appt:'9:45 AM · Follow-up'},{id:'x3',initials:'AK',name:'Aisha Khan',appt:'10:30 AM · Consultation'},{id:'x4',initials:'TW',name:'Thomas Walker',appt:'11:15 AM · Wellness Visit'}];var _q=new Set();function _r(){var _l=document.getElementById('patientList');_l.innerHTML=_x.map(function(v){var _k=_q.has(v.id);return'<div class="dw-patient'+(_k?' sent':'')+'" id="row-'+v.id+'"><div class="dw-ava">'+v.initials+'</div><div class="dw-info"><div class="dw-name">'+v.name+'</div><div class="dw-appt">'+v.appt+'</div></div><button class="dw-send'+(_k?' sent-state':'')+'" onclick="_o(\''+v.id+'\')" '+(_k?'disabled':'')+'>'+(_k?'Sent ✓':'Send Request')+'</button></div>';}).join('');}function _o(id){if(_q.has(id))return;_q.add(id);_u();_r();if(_q.size===_x.length){document.getElementById('sendAllBtn').disabled=true;}}function sendAll(){var _t=0;_x.forEach(function(v){if(!_q.has(v.id)){setTimeout(function(){_o(v.id);},_t);_t+=320;}});}function _u(){document.getElementById('statSent').textContent=_q.size;document.getElementById('statPending').textContent=_x.length-_q.size;}_r();window._o=_o;})();function submitCTA(e){e.preventDefault();var _em=document.getElementById('ctaEmail').value;document.getElementById('ctaNote').style.display='none';document.getElementById('ctaSent').style.display='block';document.getElementById('ctaEmail').value='';fetch('https://formsubmit.co/ajax/info@waveresolutions.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({email:_em,subject:'PracticePing Trial Request',message:'New trial signup request from: '+_em})}).catch(function(){});}</script>
+</body>
+</html>
