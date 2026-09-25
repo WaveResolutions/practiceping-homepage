@@ -233,6 +233,24 @@ footer { background: #060F1C; padding-block: 32px; }
 .footer-links { display: flex; gap: 20px; font-size: 13px; color: rgba(255,255,255,.4); }
 .footer-links a:hover { color: rgba(255,255,255,.7); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+@media (max-width: 860px) {
+  .hero { padding-block: 48px 52px; }
+  .feat { padding-block: 52px; }
+  .how { padding-block: 52px; }
+  .pricing { padding-block: 52px; }
+  .cta-section { padding-block: 60px; }
+  .how-head { margin-bottom: 36px; }
+  .feat-grid { gap: 32px; }
+}
+@media (max-width: 700px) {
+  .problem { padding-block: 40px; }
+  .problem-item { padding: 20px 0; }
+  .problem-num { font-size: 52px; }
+  .step { margin-bottom: 32px; }
+  .pricing-head { margin-bottom: 32px; }
+  .pc-amount { font-size: 44px; }
+  .feat-bullets li { overflow-wrap: break-word; word-break: break-word; }
+}
 </style>
 </head>
 <body>
@@ -315,7 +333,7 @@ footer { background: #060F1C; padding-block: 32px; }
         <h2>Every patient visit is a review you <em>haven't asked for yet.</em></h2>
         <p>After each appointment, PracticePing sends a personalized SMS or email — from your practice's own domain — with one tap to your Google review page. Warm, brief, or personal templates. You choose what goes out.</p>
         <ul class="feat-bullets">
-          <li>Emails sent from <em>reviews@yourdomain.com</em> — not a generic platform address</li>
+          <li>Emails sent from your domain (e.g. <em>reviews@yourpractice.com</em>) — not a generic platform address</li>
           <li>Three message tones: warm, brief, personal</li>
           <li>Bulk-send all eligible patients at once, or one at a time</li>
           <li>HIPAA-validated — no patient health data in messages</li>
@@ -339,7 +357,7 @@ footer { background: #060F1C; padding-block: 32px; }
           </div>
         </div>
         <div style="padding:12px 16px;background:var(--surface);display:flex;gap:10px;justify-content:flex-end;">
-          <span style="font-size:12.5px;color:var(--muted);align-self:center;">Sending from: reviews@yourdomain.com</span>
+          <span style="font-size:12.5px;color:var(--muted);align-self:center;word-break:break-all;">Sending from: reviews@yourdomain.com</span>
           <button style="background:var(--navy);color:#fff;border:none;padding:8px 18px;border-radius:5px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">Send ✓</button>
         </div>
       </div>
