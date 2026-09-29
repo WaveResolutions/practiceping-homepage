@@ -1,9 +1,7 @@
 {
-  "routes": [
-    { "route": "/*", "rewrite": "/index.html" }
-  ],
   "navigationFallback": {
-    "rewrite": "/index.html"
+    "rewrite": "/index.html",
+    "exclude": ["/*.html", "/*.{css,js,png,jpg,jpeg,svg,ico,json,txt,xml}"]
   },
   "globalHeaders": {
     "X-Frame-Options": "SAMEORIGIN",
