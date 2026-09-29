@@ -40,7 +40,7 @@
   <h1>How Patients Consent to Text Messages</h1>
   <p class="updated">PracticePing Patient Messaging · Last updated: September 29, 2026</p>
 
-  <p>PracticePing sends text messages only to patients who have given their medical practice consent to receive them. Patients give consent in one of two ways during patient intake or check-in: by checking the SMS consent box on the practice's intake form, or verbally to practice staff, who read the script below and record the consent. Consent is optional and is not a condition of receiving care.</p>
+  <p>PracticePing sends text messages only to patients who have given their medical practice consent to receive them. Patients give consent in one of three ways: by checking the SMS consent box on the practice's intake form, verbally to practice staff (who read the script below and record the consent), or by checking the optional SMS consent box on the practice's online appointment request form. Consent is optional and is not a condition of receiving care.</p>
 
   <h2>1. Paper patient intake form</h2>
   <p>Participating practices include the following SMS consent section on their patient intake/registration form. The patient checks the box, writes their mobile number, and signs.</p>
@@ -66,7 +66,18 @@
   </div>
   <p>Staff record the patient's answer, the mobile number, the date, and the staff member's name in the practice's patient record. PracticePing only sends messages to numbers the practice has marked as consented.</p>
 
-  <h2>3. What patients receive</h2>
+  <h2>3. Online appointment request form</h2>
+  <p>Each practice has an online appointment request page hosted by PracticePing. The form asks for the patient's name, contact details, and preferred times. Below the form is an optional checkbox that is unchecked by default. The request can be submitted without checking it; texts about the request are sent only if the patient checks the box.</p>
+  <div class="form-sample">
+    <h3>Online form checkbox (unchecked by default)</h3>
+    <div class="check">
+      <div class="box"></div>
+      <p>I agree to receive text messages from <strong>[Practice Name]</strong>, sent through PracticePing, about my appointment request (such as available appointment times). Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out or HELP for help. Consent is optional and not required to request an appointment. See PracticePing's Terms (practiceping.com/terms.html) and Privacy Policy (practiceping.com/privacy.html).</p>
+    </div>
+  </div>
+  <p>The checkbox value is stored with the request. Practice staff can reply to the request by text only if the patient checked the box; otherwise they reply by email or phone.</p>
+
+  <h2>4. What patients receive</h2>
   <p>After consenting, patients receive only these kinds of messages. Every message identifies the practice and includes opt-out instructions. Messages never include diagnoses or treatment details.</p>
   <p class="label">Feedback request after a visit</p>
   <div class="msg">[Practice Name]: Hi Jane, thank you for visiting us today. We'd love your Google review: https://g.page/r/[practice-review-id]/review Reply STOP to opt out.</div>
@@ -74,12 +85,14 @@
   <div class="msg">[Practice Name]: Hi Jane, it's been over a year since your last visit. Book a check-up: [practice booking link] Reply STOP to opt out.</div>
   <p class="label">Same-day appointment opening</p>
   <div class="msg">[Practice Name]: Hi Jane, a 3:30 PM appointment just opened up today. Reply YES to claim it or call us to schedule. Reply STOP to opt out.</div>
+  <p class="label">Reply to an online appointment request</p>
+  <div class="msg">[Practice Name]: Hi Jane, thanks for your appointment request. We have openings Tue 10:00 AM or Thu 2:15 PM. Reply with the time that works or call us. Reply STOP to opt out.</div>
   <p class="label">Opt-out confirmation (after STOP)</p>
   <div class="msg">[Practice Name]: You have been unsubscribed and will receive no further messages. Reply START to resubscribe.</div>
   <p class="label">Help response (after HELP)</p>
   <div class="msg">[Practice Name] via PracticePing: For help, contact info@waveresolutions.com. Msg &amp; data rates may apply. Reply STOP to opt out.</div>
 
-  <h2>4. Opting out</h2>
+  <h2>5. Opting out</h2>
   <p>Patients can reply <strong>STOP</strong> to any message at any time. PracticePing immediately stops all messages to that number and sends one confirmation. Patients can also ask their practice to stop messages.</p>
 
   <p>Questions? Contact <a href="mailto:info@waveresolutions.com">info@waveresolutions.com</a>. See our <a href="/terms.html">Terms</a> and <a href="/privacy.html">Privacy Policy</a>.</p>
