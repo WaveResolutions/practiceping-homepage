@@ -532,6 +532,52 @@ footer { background: #060F1C; padding-block: 32px; }
           <input class="cta-input" id="ctaPhone" type="tel" placeholder="Phone Number" required>
           <input class="cta-input full" id="ctaAddress" type="text" placeholder="Business Address (Street)" required>
           <input class="cta-input full" id="ctaCity" type="text" placeholder="City, State, ZIP" required>
+          <select class="cta-input full" id="ctaSpecialty" required>
+            <option value="" disabled selected>Practice Specialty</option>
+            <option>Family Medicine</option>
+            <option>Internal Medicine</option>
+            <option>Pediatrics</option>
+            <option>Dental / Orthodontics</option>
+            <option>Orthopedics</option>
+            <option>Dermatology</option>
+            <option>OB/GYN</option>
+            <option>Ophthalmology</option>
+            <option>Chiropractic</option>
+            <option>Physical Therapy</option>
+            <option>Mental Health / Psychiatry</option>
+            <option>Urgent Care</option>
+            <option>Other</option>
+          </select>
+          <select class="cta-input" id="ctaProviders" required>
+            <option value="" disabled selected>Number of Providers</option>
+            <option>1</option>
+            <option>2–5</option>
+            <option>6–10</option>
+            <option>11–25</option>
+            <option>25+</option>
+          </select>
+          <select class="cta-input" id="ctaEHR">
+            <option value="" disabled selected>Current EHR / Software (optional)</option>
+            <option>athenahealth</option>
+            <option>Epic</option>
+            <option>Cerner</option>
+            <option>eClinicalWorks</option>
+            <option>NextGen</option>
+            <option>Kareo / Tebra</option>
+            <option>Practice Fusion</option>
+            <option>DrChrono</option>
+            <option>None / Paper-based</option>
+            <option>Other</option>
+          </select>
+          <select class="cta-input" id="ctaReferral">
+            <option value="" disabled selected>How did you hear about us?</option>
+            <option>Google Search</option>
+            <option>Colleague / Referral</option>
+            <option>Social Media</option>
+            <option>Online Ad</option>
+            <option>Conference / Event</option>
+            <option>Other</option>
+          </select>
         </div>
         <button class="cta-details-submit" id="ctaSubmitBtn" onclick="submitCTA()">Request My Free Trial</button>
         <br><button class="cta-back" onclick="goBack()">← Back</button>
@@ -562,6 +608,6 @@ footer { background: #060F1C; padding-block: 32px; }
   </div>
 </footer>
 
-<script>(function(){var _d=new Date();var _m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];document.getElementById('demoDate').textContent=_m[_d.getMonth()]+' '+_d.getDate()+', '+_d.getFullYear();var _e=document.getElementById('nav');window.addEventListener('scroll',function(){_e.classList.toggle('scrolled',window.scrollY>40)},{passive:true});_e.classList.toggle('scrolled',window.scrollY>40);var _x=[{id:'x1',initials:'SJ',name:'Sarah Johnson',appt:'9:00 AM · Annual Physical'},{id:'x2',initials:'MR',name:'Michael Rivera',appt:'9:45 AM · Follow-up'},{id:'x3',initials:'AK',name:'Aisha Khan',appt:'10:30 AM · Consultation'},{id:'x4',initials:'TW',name:'Thomas Walker',appt:'11:15 AM · Wellness Visit'}];var _q=new Set();function _r(){var _l=document.getElementById('patientList');_l.innerHTML=_x.map(function(v){var _k=_q.has(v.id);return'<div class="dw-patient'+(_k?' sent':'')+'" id="row-'+v.id+'"><div class="dw-ava">'+v.initials+'</div><div class="dw-info"><div class="dw-name">'+v.name+'</div><div class="dw-appt">'+v.appt+'</div></div><button class="dw-send'+(_k?' sent-state':'')+'" onclick="_o(\''+v.id+'\')" '+(_k?'disabled':'')+'>'+(_k?'Sent ✓':'Send Request')+'</button></div>';}).join('');}function _o(id){if(_q.has(id))return;_q.add(id);_u();_r();if(_q.size===_x.length){document.getElementById('sendAllBtn').disabled=true;}}function sendAll(){var _t=0;_x.forEach(function(v){if(!_q.has(v.id)){setTimeout(function(){_o(v.id);},_t);_t+=320;}});}function _u(){document.getElementById('statSent').textContent=_q.size;document.getElementById('statPending').textContent=_x.length-_q.size;}_r();window._o=_o;})();function nextStep(e){e.preventDefault();document.getElementById('ctaStep1').style.display='none';document.getElementById('ctaStep2').style.display='block';document.getElementById('ctaBusinessName').focus();}function goBack(){document.getElementById('ctaStep2').style.display='none';document.getElementById('ctaStep1').style.display='flex';}async function submitCTA(){var btn=document.getElementById('ctaSubmitBtn');var businessName=document.getElementById('ctaBusinessName').value.trim();var contactName=document.getElementById('ctaContactName').value.trim();var phone=document.getElementById('ctaPhone').value.trim();var address=document.getElementById('ctaAddress').value.trim();var city=document.getElementById('ctaCity').value.trim();if(!businessName||!contactName||!phone||!address||!city){alert('Please fill in all required fields.');return;}var email=document.getElementById('ctaEmail').value;btn.disabled=true;btn.textContent='Submitting...';try{var r=await fetch('https://reviewreach-api.azurewebsites.net/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,businessName:businessName,contactName:contactName,phone:phone,address:address,city:city})});if(!r.ok)throw new Error();document.getElementById('ctaNote').style.display='none';document.getElementById('ctaSent').style.display='block';document.getElementById('ctaStep2').style.display='none';}catch(err){btn.disabled=false;btn.textContent='Request My Free Trial';alert('Something went wrong — please email info@waveresolutions.com directly.');}}</script>
+<script>(function(){var _d=new Date();var _m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];document.getElementById('demoDate').textContent=_m[_d.getMonth()]+' '+_d.getDate()+', '+_d.getFullYear();var _e=document.getElementById('nav');window.addEventListener('scroll',function(){_e.classList.toggle('scrolled',window.scrollY>40)},{passive:true});_e.classList.toggle('scrolled',window.scrollY>40);var _x=[{id:'x1',initials:'SJ',name:'Sarah Johnson',appt:'9:00 AM · Annual Physical'},{id:'x2',initials:'MR',name:'Michael Rivera',appt:'9:45 AM · Follow-up'},{id:'x3',initials:'AK',name:'Aisha Khan',appt:'10:30 AM · Consultation'},{id:'x4',initials:'TW',name:'Thomas Walker',appt:'11:15 AM · Wellness Visit'}];var _q=new Set();function _r(){var _l=document.getElementById('patientList');_l.innerHTML=_x.map(function(v){var _k=_q.has(v.id);return'<div class="dw-patient'+(_k?' sent':'')+'" id="row-'+v.id+'"><div class="dw-ava">'+v.initials+'</div><div class="dw-info"><div class="dw-name">'+v.name+'</div><div class="dw-appt">'+v.appt+'</div></div><button class="dw-send'+(_k?' sent-state':'')+'" onclick="_o(\''+v.id+'\')" '+(_k?'disabled':'')+'>'+(_k?'Sent ✓':'Send Request')+'</button></div>';}).join('');}function _o(id){if(_q.has(id))return;_q.add(id);_u();_r();if(_q.size===_x.length){document.getElementById('sendAllBtn').disabled=true;}}function sendAll(){var _t=0;_x.forEach(function(v){if(!_q.has(v.id)){setTimeout(function(){_o(v.id);},_t);_t+=320;}});}function _u(){document.getElementById('statSent').textContent=_q.size;document.getElementById('statPending').textContent=_x.length-_q.size;}_r();window._o=_o;})();function nextStep(e){e.preventDefault();document.getElementById('ctaStep1').style.display='none';document.getElementById('ctaStep2').style.display='block';document.getElementById('ctaBusinessName').focus();}function goBack(){document.getElementById('ctaStep2').style.display='none';document.getElementById('ctaStep1').style.display='flex';}async function submitCTA(){var btn=document.getElementById('ctaSubmitBtn');var businessName=document.getElementById('ctaBusinessName').value.trim();var contactName=document.getElementById('ctaContactName').value.trim();var phone=document.getElementById('ctaPhone').value.trim();var address=document.getElementById('ctaAddress').value.trim();var city=document.getElementById('ctaCity').value.trim();var specialty=document.getElementById('ctaSpecialty').value;var providers=document.getElementById('ctaProviders').value;var ehr=document.getElementById('ctaEHR').value;var referral=document.getElementById('ctaReferral').value;if(!businessName||!contactName||!phone||!address||!city||!specialty||!providers){alert('Please fill in all required fields.');return;}var email=document.getElementById('ctaEmail').value;btn.disabled=true;btn.textContent='Submitting...';try{var r=await fetch('https://reviewreach-api.azurewebsites.net/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,businessName:businessName,contactName:contactName,phone:phone,address:address,city:city,specialty:specialty,providers:providers,ehr:ehr,referral:referral})});if(!r.ok)throw new Error();document.getElementById('ctaNote').style.display='none';document.getElementById('ctaSent').style.display='block';document.getElementById('ctaStep2').style.display='none';}catch(err){btn.disabled=false;btn.textContent='Request My Free Trial';alert('Something went wrong — please email info@waveresolutions.com directly.');}}</script>
 </body>
 </html>
