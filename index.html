@@ -73,14 +73,14 @@ nav.scrolled {
 }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 60px; }
 .nav-brand { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; color: #fff; letter-spacing: -.3px; display: flex; align-items: center; gap: 9px; }
-.nav-brand span { color: var(--gold); }
+.nav-brand .wm span { color: var(--gold); }
 .nav-logo-gem { width: 30px; height: 30px; border-radius: 7px; background: linear-gradient(135deg, #1B5FC4, #2E7DE6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .nav-links { display: flex; gap: 28px; font-size: 14px; font-weight: 500; color: rgba(255,255,255,.7); }
 .nav-links a:hover { color: #fff; }
 .nav-cta { background: var(--gold); color: #fff; font-size: 13.5px; font-weight: 600; padding: 8px 18px; border-radius: 5px; white-space: nowrap; transition: opacity .15s; }
 .nav-cta:hover { opacity: .88; }
 @media (max-width: 600px) { .nav-links { display: none; } }
-.hero { background: var(--navy); padding-block: 80px 72px; position: relative; overflow: hidden; }
+.hero { background: var(--navy); padding-block: 64px 56px; position: relative; overflow: hidden; }
 .hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 70% 50%, rgba(200,146,42,.07) 0%, transparent 70%); pointer-events: none; }
 .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
 @media (max-width: 860px) { .hero-grid { grid-template-columns: 1fr; gap: 48px; } }
@@ -119,7 +119,7 @@ nav.scrolled {
 .dw-send { font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 4px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; white-space: nowrap; transition: all .15s; font-family: inherit; flex-shrink: 0; }
 .dw-send:hover { border-color: var(--gold); color: var(--gold); }
 .dw-send.sent-state { background: var(--green-bg); border-color: var(--green); color: var(--green-text); cursor: default; }
-.problem { background: var(--surface); padding-block: 64px; border-bottom: 1px solid var(--border); }
+.problem { background: var(--surface); padding-block: 48px; border-bottom: 1px solid var(--border); }
 .problem-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
 @media (max-width: 700px) { .problem-grid { grid-template-columns: 1fr; } }
 .problem-item { padding: 0 40px; border-right: 1px solid var(--border); }
@@ -131,9 +131,9 @@ nav.scrolled {
 :root[data-theme="dark"] .problem-num { color: var(--text); }
 .problem-text { font-size: 15px; line-height: 1.65; color: var(--muted); max-width: 260px; }
 .problem-text strong { color: var(--text); font-weight: 600; }
-.feat { padding-block: 88px; }
-.feat.alt { background: var(--ground); }
-.feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+.feat { padding-block: 64px; }
+.feat.alt { background: var(--surface); border-block: 1px solid var(--border); }
+.feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
 .feat-grid.flip { direction: rtl; }
 .feat-grid.flip > * { direction: ltr; }
 @media (max-width: 840px) { .feat-grid, .feat-grid.flip { grid-template-columns: 1fr; direction: ltr; gap: 44px; } }
@@ -168,8 +168,8 @@ nav.scrolled {
 .notif-text { font-size: 12.5px; color: var(--text); }
 .notif-text strong { font-weight: 600; }
 .notif-status { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--green); background: var(--green-bg); padding: 2px 8px; border-radius: 20px; flex-shrink: 0; }
-.how { background: var(--navy); padding-block: 80px; }
-.how-head { text-align: center; margin-bottom: 56px; }
+.how { background: var(--navy); padding-block: 64px; }
+.how-head { text-align: center; margin-bottom: 44px; }
 .how-eyebrow { font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 12px; }
 .how h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(30px, 4vw, 46px); font-weight: 500; color: #fff; letter-spacing: -.4px; line-height: 1.15; }
 .steps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; position: relative; }
@@ -184,8 +184,8 @@ nav.scrolled {
 .step h3 { font-size: 17px; font-weight: 600; color: #fff; margin-bottom: 10px; }
 .step p { font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,.5); max-width: 220px; margin: 0 auto; }
 @media (max-width: 700px) { .step p { margin: 0; } }
-.pricing { background: var(--surface); padding-block: 80px; }
-.pricing-head { text-align: center; margin-bottom: 48px; }
+.pricing { background: var(--surface); padding-block: 64px; }
+.pricing-head { text-align: center; margin-bottom: 40px; }
 .pricing-eyebrow { font-size: 11px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 12px; }
 .pricing h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(30px, 4vw, 46px); font-weight: 500; color: var(--text); letter-spacing: -.4px; }
 .pricing-layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: 40px; align-items: start; }
@@ -212,7 +212,7 @@ nav.scrolled {
 .comp-price.ours { color: var(--green); }
 .comp-trial { font-size: 12.5px; color: var(--muted); }
 .comp-trial.good { color: var(--green); font-weight: 600; }
-.cta-section { background: var(--navy); padding-block: 88px; border-top: 1px solid rgba(255,255,255,.05); }
+.cta-section { background: var(--navy); padding-block: 72px; border-top: 1px solid rgba(255,255,255,.05); }
 .cta-inner { text-align: center; max-width: 600px; margin: 0 auto; }
 .cta-section h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(32px, 5vw, 52px); font-weight: 500; color: #fff; line-height: 1.18; text-wrap: balance; margin-bottom: 14px; letter-spacing: -.4px; }
 .cta-section h2 em { color: var(--gold); font-style: italic; }
@@ -240,19 +240,19 @@ nav.scrolled {
 footer { background: #060F1C; padding-block: 32px; }
 .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .footer-brand { font-weight: 700; font-size: 16px; color: rgba(255,255,255,.7); }
-.footer-brand span { color: var(--gold); }
+.footer-brand .wm span { color: var(--gold); }
 .footer-copy { font-size: 12.5px; color: rgba(255,255,255,.25); }
 .footer-links { display: flex; gap: 20px; font-size: 13px; color: rgba(255,255,255,.4); }
 .footer-links a:hover { color: rgba(255,255,255,.7); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 @media (max-width: 860px) {
-  .hero { padding-block: 48px 52px; }
-  .feat { padding-block: 52px; }
-  .how { padding-block: 52px; }
-  .pricing { padding-block: 52px; }
-  .cta-section { padding-block: 60px; }
-  .how-head { margin-bottom: 36px; }
-  .feat-grid { gap: 32px; }
+  .hero { padding-block: 40px 44px; }
+  .feat { padding-block: 40px; }
+  .how { padding-block: 44px; }
+  .pricing { padding-block: 44px; }
+  .cta-section { padding-block: 52px; }
+  .how-head { margin-bottom: 28px; }
+  .feat-grid { gap: 24px; }
 
   /* Mobile centering */
   .hero-text { text-align: center; }
@@ -269,8 +269,8 @@ footer { background: #060F1C; padding-block: 32px; }
   .pricing-head { text-align: center; }
 }
 @media (max-width: 700px) {
-  .problem { padding-block: 40px; }
-  .problem-item { padding: 20px 0; }
+  .problem { padding-block: 28px; }
+  .problem-item { padding: 16px 0; }
   .problem-num { font-size: 52px; }
   .step { margin-bottom: 32px; }
   .pricing-head { margin-bottom: 32px; }
@@ -286,7 +286,7 @@ footer { background: #060F1C; padding-block: 32px; }
     <div class="nav-inner">
       <div class="nav-brand">
         <div class="nav-logo-gem"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="18" height="18"><circle cx="6" cy="12" r="2.8" fill="white"/><path d="M11.5 7.5C15 9.8 15 14.2 11.5 16.5" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M15.5 4C22 7.5 22 16.5 15.5 20" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/></svg></div>
-        Practice<span>Ping</span>
+        <span class="wm">Practice<span>Ping</span></span>
       </div>
       <div class="nav-links">
         <a href="#features">Features</a>
@@ -594,7 +594,7 @@ footer { background: #060F1C; padding-block: 32px; }
     <div class="footer-inner">
       <div class="footer-brand" style="display:flex;align-items:center;gap:9px;">
         <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#1B5FC4,#2E7DE6);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16"><circle cx="6" cy="12" r="2.8" fill="white"/><path d="M11.5 7.5C15 9.8 15 14.2 11.5 16.5" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M15.5 4C22 7.5 22 16.5 15.5 20" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/></svg></div>
-        Practice<span>Ping</span>
+        <span class="wm">Practice<span>Ping</span></span>
       </div>
       <div class="footer-links">
         <a href="#features">Features</a>
