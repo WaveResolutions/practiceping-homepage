@@ -528,9 +528,25 @@ async function loadSignups() {
   const d = await api('GET', `/api/admin/signups?status=${encodeURIComponent(state.filter)}`);
   state.signups = d.signups; state.counts = d.counts || {};
 }
+const usd = c => `$${(c / 100).toFixed(2)}`;
+// Monthly price field: owners can set a custom price; everyone else sees the standard price, locked.
+function priceField(customCents) {
+  const std = state.defaultPriceCents || 19900, allowed = can('pricing:set');
+  return `<div><label class="f" for="f_price">Monthly price after the trial ($)</label>
+    <input id="f_price" type="number" min="1" max="1000" step="0.01" value="${((customCents || std) / 100).toFixed(2)}"${allowed ? '' : ' disabled'}>
+    <div class="hint">${allowed ? `Standard price is ${usd(std)}. Charged to the client's card every month once the trial ends.` : `Standard price (${usd(std)}). Only an owner can set a custom price.`}</div></div>`;
+}
+// undefined = leave out (not allowed), null = standard price, number = custom price in cents
+function priceFromForm() {
+  const el = document.getElementById('f_price');
+  if (!el || el.disabled) return undefined;
+  const cents = Math.round(Number(el.value) * 100);
+  if (!Number.isFinite(cents) || cents < 100 || cents > 100000) throw new Error('Enter a monthly price between $1.00 and $1,000.00.');
+  return cents === (state.defaultPriceCents || 19900) ? null : cents;
+}
 async function loadPractices() {
   const d = await api('GET', '/api/admin/practices');
-  state.practices = d.practices;
+  state.practices = d.practices; state.defaultPriceCents = d.defaultPriceCents || 19900;
 }
 
 /* ───────── tabs & render ───────── */
@@ -842,6 +858,7 @@ function openCreate(signup) {
       <div><label class="f" for="f_plan">Plan</label><select id="f_plan"><option value="professional" selected>Professional</option><option value="starter">Starter</option><option value="enterprise">Enterprise</option></select></div>
       <div><label class="f" for="f_dataSource">Patient data source</label><select id="f_dataSource"><option value="imported" selected>CSV / email import</option><option value="athena">athenahealth API</option></select></div>
       <div><label class="f" for="f_slug">Short name (URL slug)</label><input id="f_slug" type="text" value="${esc(slugify(v.name))}" maxlength="60"></div>
+      ${priceField(null)}
     </div></fieldset>
     <fieldset><legend>Links &amp; notes</legend><div class="grid2">
       <div class="full"><label class="f" for="f_googleReviewLink">Google review link</label><input id="f_googleReviewLink" type="url" placeholder="https://g.page/r/…/review" maxlength="1000"></div>
@@ -859,7 +876,10 @@ $('#createForm').addEventListener('submit', async e => {
   e.preventDefault();
   const save = $('#createSave'); if (!save) return;
   save.disabled = true; $('#createErr').textContent = '';
+  let monthlyPriceCents;
+  try { monthlyPriceCents = priceFromForm(); } catch (err) { save.disabled = false; $('#createErr').textContent = err.message; return; }
   const body = {
+    monthlyPriceCents,
     name: val('f_name'), slug: val('f_slug') || undefined, adminEmail: val('f_adminEmail'), adminName: val('f_adminName'),
     trialDays: Number(val('f_trialDays') || 90), plan: val('f_plan'), dataSource: val('f_dataSource'),
     contactName: val('f_contactName'), contactEmail: val('f_contactEmail'), contactPhone: val('f_contactPhone'),
@@ -906,7 +926,7 @@ function openEdit(p) {
     contactName: p.contact_name, contactEmail: p.contact_email, contactPhone: p.contact_phone, address: p.address, cityStateZip: p.city_state_zip })}
     <fieldset><legend>Plan, links &amp; notes</legend><div class="grid2">
       <div><label class="f" for="f_plan">Plan</label><select id="f_plan">${['starter','professional','enterprise'].map(x => `<option value="${x}"${p.plan === x ? ' selected' : ''}>${x[0].toUpperCase() + x.slice(1)}</option>`).join('')}</select></div>
-      <div></div>
+      ${priceField(p.monthly_price_cents)}
       <div class="full"><label class="f" for="f_googleReviewLink">Google review link</label><input id="f_googleReviewLink" type="url" value="${esc(p.google_review_link)}" maxlength="1000"></div>
       <div class="full"><label class="f" for="f_bookingLink">Booking link</label><input id="f_bookingLink" type="url" value="${esc(p.booking_link)}" maxlength="1000"></div>
       <div class="full"><label class="f" for="f_internalNotes">Internal notes</label><textarea id="f_internalNotes" maxlength="5000">${esc(p.internal_notes)}</textarea></div>
@@ -919,13 +939,17 @@ $('#editForm').addEventListener('submit', async e => {
   e.preventDefault();
   const save = $('#editSave'); save.disabled = true; $('#editErr').textContent = '';
   try {
-    await api('PUT', `/api/admin/practices/${encodeURIComponent(editSlug)}`, {
+    let monthlyPriceCents = priceFromForm();
+    const current = state.practices.find(x => x.slug === editSlug);
+    if (monthlyPriceCents !== undefined && (monthlyPriceCents || null) === ((current && current.monthly_price_cents) || null)) monthlyPriceCents = undefined;   // unchanged
+    const r = await api('PUT', `/api/admin/practices/${encodeURIComponent(editSlug)}`, {
+      monthlyPriceCents,
       contactName: val('f_contactName'), contactEmail: val('f_contactEmail'), contactPhone: val('f_contactPhone'),
       address: val('f_address'), cityStateZip: val('f_cityStateZip'), specialty: val('f_specialty'), providerCount: val('f_providers'),
       ehr: val('f_ehr'), referralSource: val('f_referral'), internalNotes: val('f_internalNotes'),
       googleReviewLink: val('f_googleReviewLink'), bookingLink: val('f_bookingLink'), plan: val('f_plan'),
     });
-    await loadPractices(); render(); $('#editDlg').close(); toast('Saved');
+    await loadPractices(); render(); $('#editDlg').close(); toast(r && r.note ? r.note : 'Saved', !!(r && r.note));
   } catch (err) { if (err.message !== 'SESSION_ENDED') $('#editErr').textContent = err.message; }
   finally { save.disabled = false; }
 });
@@ -987,6 +1011,7 @@ function renderPractices() {
         <div class="fact"><dt>Admin login</dt><dd>${esc(p.admin_email || '—')}</dd></div>
         <div class="fact"><dt>Last login</dt><dd>${esc(fmtDateTime(p.last_login_at))}</dd></div>
         <div class="fact"><dt>Messages sent</dt><dd>${esc(p.messages_sent)}</dd></div>
+        <div class="fact"><dt>Monthly price</dt><dd>${esc(usd(p.monthly_price_cents || state.defaultPriceCents || 19900))} <span class="hint">${p.monthly_price_cents ? '(custom)' : '(standard)'}</span></dd></div>
         <div class="fact"><dt>${p.subscription_status === 'active' ? 'Paid since' : 'Trial ends'}</dt><dd>${esc(p.subscription_status === 'active' ? fmtDate(p.subscription_starts_at) : fmtDate(p.trial_ends_at))}</dd></div>
         <div class="fact"><dt>Contact</dt><dd>${esc(p.contact_name || '—')}${p.contact_phone ? ' · ' + esc(p.contact_phone) : ''}</dd></div>
         <div class="fact"><dt>Specialty · providers</dt><dd>${esc([p.specialty, p.provider_count].filter(Boolean).join(' · ') || '—')}</dd></div>
