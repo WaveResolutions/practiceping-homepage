@@ -470,11 +470,11 @@ $('#createForm').addEventListener('submit', async e => {
 });
 function showCreated(r) {
   const loginUrl = r.loginUrl || 'https://ilipcare.practiceping.com';
-  const welcome = `Hi ${r.admin.name},\n\nYour PracticePing trial for ${r.practice.name} is ready.\n\nLog in: ${loginUrl}\nEmail: ${r.admin.email}\nTemporary password: ${r.admin.temporaryPassword}\n\nYour free trial runs until ${fmtDate(r.practice.trial_ends_at)}. No card is needed until then.\n\nReply to this email if you need anything.\n\nThe PracticePing Team`;
+  const welcome = `Hi ${r.admin.name},\n\nYour PracticePing trial for ${r.practice.name} is ready.\n\nLog in: ${loginUrl}\nEmail: ${r.admin.email}\nTemporary password: ${r.admin.temporaryPassword}\n\nYou'll be asked to choose your own password when you first sign in.\n\nYour free trial runs until ${fmtDate(r.practice.trial_ends_at)}. No card is needed until then.\n\nReply to this email if you need anything.\n\nThe PracticePing Team`;
   $('#createTitle').textContent = 'Practice created';
   $('#createBody').innerHTML = `
     <div class="ok-box">${esc(r.practice.name)} is set up with a trial until ${esc(fmtDate(r.practice.trial_ends_at))}.</div>
-    <div class="warn-box"><strong>Save the password now.</strong> It is shown only once and is not stored anywhere readable. If it is lost, ask for a reset.</div>
+    <div class="warn-box"><strong>Save the password now.</strong> It is shown only once and is not stored anywhere readable. The client must choose their own password at first sign-in. If this one is lost, use "Reset password" on the practice.</div>
     <div class="copyrow"><input readonly aria-label="Login URL" value="${esc(loginUrl)}" data-sel><button class="btn small" type="button" data-copy="${esc(loginUrl)}">Copy</button></div>
     <div class="copyrow"><input readonly aria-label="Admin email" value="${esc(r.admin.email)}" data-sel><button class="btn small" type="button" data-copy="${esc(r.admin.email)}">Copy</button></div>
     <div class="copyrow"><input readonly aria-label="Temporary password" value="${esc(r.admin.temporaryPassword)}" data-sel><button class="btn small" type="button" data-copy="${esc(r.admin.temporaryPassword)}">Copy</button></div>
@@ -563,6 +563,9 @@ function renderPractices() {
       : `<button class="btn small" type="button" data-act="activate"${dis}>Mark active (paid offline)</button>`);
     buttons.push(`<span class="inline"><label class="f" for="d-${esc(p.slug)}" style="margin:0">Days</label><input id="d-${esc(p.slug)}" type="number" min="1" max="365" value="30" aria-label="Days to add to the trial"><button class="btn small" type="button" data-act="extend"${dis}>${p.subscription_status === 'trial' ? 'Extend trial' : 'Restart trial'}</button></span>`);
     buttons.push(`<button class="btn small" type="button" data-act="edit">Edit details</button>`);
+    buttons.push(armed === 'reset'
+      ? `<button class="btn navy small" type="button" data-act="reset-go"${dis}>Confirm: reset password</button><button class="btn small ghost" type="button" data-act="disarm">Back</button>`
+      : `<button class="btn small" type="button" data-act="reset"${dis}>Reset password</button>`);
     buttons.push(`<button class="btn small" type="button" data-act="sms"${dis}>SMS registration</button>`);
     if (p.subscription_status !== 'cancelled') buttons.push(armed === 'cancel'
       ? `<button class="btn danger armed small" type="button" data-act="cancel-go"${dis}>Confirm: cancel${p.has_subscription ? ' + stop billing' : ''}</button><button class="btn small ghost" type="button" data-act="disarm">Back</button>`
@@ -596,6 +599,15 @@ function panelHtml(slug) {
   if (pn.type === 'portal') return `<div class="panel"><h4>Billing portal</h4>
     <div class="copyrow"><input readonly value="${esc(pn.url)}" aria-label="Billing portal link" data-sel><button class="btn small" type="button" data-copy="${esc(pn.url)}">Copy</button>${pn.url.startsWith('https://') ? `<a class="btn small" href="${esc(pn.url)}" target="_blank" rel="noopener noreferrer">Open</a>` : ''}</div>
     <div class="hint">Stripe-hosted page to update the card, view invoices or cancel. Anyone with this link can manage the subscription, so only send it to the client.</div></div>`;
+  if (pn.type === 'reset') {
+    const url = pn.loginUrl || 'https://ilipcare.practiceping.com';
+    const msg = `Hi ${pn.user.name},\n\nWe've reset your PracticePing password.\n\nLog in: ${url}\nEmail: ${pn.user.email}\nTemporary password: ${pn.temporaryPassword}\n\nYou'll be asked to choose a new password when you sign in.\n\nThe PracticePing Team`;
+    return `<div class="panel"><h4>Password reset for ${esc(pn.user.email)}</h4>
+      <div class="warn-box" style="margin-top:0"><strong>Shown once.</strong> Their old password and any open sessions have stopped working. They must choose a new password the next time they sign in.</div>
+      <div class="copyrow"><input readonly aria-label="Login URL" value="${esc(url)}" data-sel><button class="btn small" type="button" data-copy="${esc(url)}">Copy</button></div>
+      <div class="copyrow"><input readonly aria-label="Temporary password" value="${esc(pn.temporaryPassword)}" data-sel><button class="btn small" type="button" data-copy="${esc(pn.temporaryPassword)}">Copy</button></div>
+      <button class="btn small" type="button" data-copy="${esc(msg)}">Copy message to send</button></div>`;
+  }
   if (pn.type === 'sms') {
     const reg = pn.registration || {};
     const rows = Object.entries(reg).filter(([, v]) => v !== null && v !== '' && typeof v !== 'object').map(([k, v]) => `<dt>${esc(k.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').replace(/^./, c => c.toUpperCase()))}</dt><dd>${esc(v)}</dd>`).join('');
@@ -619,7 +631,13 @@ $('#practiceList').addEventListener('click', async e => {
     finally { state.busy.delete(slug); await loadPractices().catch(() => {}); render(); }
   };
   if (act === 'edit') return openEdit(p);
-  if (act === 'activate' || act === 'cancel') { state.armed = { slug, act }; return renderPractices(); }
+  if (act === 'activate' || act === 'cancel' || act === 'reset') { state.armed = { slug, act }; return renderPractices(); }
+  if (act === 'reset-go') return run(async () => {
+    state.armed = null;
+    const r = await api('POST', `/api/admin/practices/${enc}/reset-password`, {});
+    state.panels[slug] = { type: 'reset', ...r };
+    toast('Password reset. Copy it now: it is shown only once.');
+  });
   if (act === 'disarm') { state.armed = null; return renderPractices(); }
   if (act === 'activate-go') { state.armed = null; return run(async () => { await api('POST', '/api/admin/subscription', { slug, action: 'activate' }); toast(`${p.name} marked active`); }); }
   if (act === 'cancel-go') return run(async () => {
