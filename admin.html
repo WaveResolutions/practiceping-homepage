@@ -136,6 +136,39 @@ legend { font-size: 12px; font-weight: 700; letter-spacing: .7px; text-transform
 #toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--navy); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; max-width: min(520px, calc(100vw - 32px)); box-shadow: 0 8px 28px rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 100; }
 #toast.show { opacity: 1; }
 #toast.bad { background: #8B1A1A; }
+.who { color: rgba(255,255,255,.85); font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
+.who .role { font-size: 10.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; background: rgba(200,146,42,.22); color: #F0C987; padding: 2px 8px; border-radius: 20px; }
+@media (max-width: 720px) { .who .nm { display: none; } .top-inner { gap: 8px; } }
+.btn-top, .env, .who .role { white-space: nowrap; }
+.top-actions { flex-wrap: nowrap; gap: 8px; }
+.gate.wide { max-width: 540px; }
+.gate .alt { text-align: center; margin-top: 16px; font-size: 13px; }
+.gate .alt a { color: var(--muted); }
+.gate form { display: grid; gap: 14px; }
+.gate .stack { display: grid; gap: 14px; }
+.gate h2 { font-size: 15px; margin: 6px 0 -4px; }
+.btn.block { width: 100%; padding: 11px 14px; font-size: 14.5px; }
+.qrbox { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; background: var(--ground); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+.qrbox img { width: 168px; height: 168px; background: #fff; border-radius: 6px; padding: 6px; }
+.qrbox .manual { flex: 1; min-width: 180px; font-size: 13px; color: var(--muted); }
+.qrbox .manual code { display: block; margin-top: 6px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; color: var(--text); word-break: break-all; user-select: all; }
+.codes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 4px 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; }
+.codes span { background: var(--ground); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; text-align: center; letter-spacing: .5px; user-select: all; }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; }
+.check input { width: auto; margin-top: 4px; }
+.roles { display: grid; gap: 8px; }
+.roleopt { display: flex; gap: 10px; align-items: flex-start; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+.roleopt:has(input:checked) { border-color: var(--focus); background: var(--blue-bg); }
+.roleopt input { width: auto; margin-top: 4px; }
+.roleopt strong { display: block; font-size: 14px; }
+.roleopt span { font-size: 12.5px; color: var(--muted); }
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); margin-bottom: 60px; }
+table.log { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.log th { text-align: left; font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.log td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.log tr:last-child td { border-bottom: none; }
+.mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; }
+.inline-select { width: auto; padding: 5px 8px; font-size: 13px; }
 [hidden] { display: none !important; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -150,30 +183,24 @@ legend { font-size: 12px; font-weight: 700; letter-spacing: .7px; text-transform
     </div>
     <div class="top-actions">
       <span class="env" id="envBadge" hidden>Local API</span>
-      <button class="btn-top" id="lockBtn" type="button" hidden>Lock</button>
+      <span class="env" id="emergencyBadge" hidden>Emergency access</span>
+      <span class="who" id="who" hidden></span>
+      <button class="btn-top" id="accountBtn" type="button" hidden>Account</button>
+      <button class="btn-top" id="lockBtn" type="button" hidden>Sign out</button>
     </div>
   </div>
 </header>
 
 <main class="wrap">
 
-  <section class="gate" id="gate" aria-labelledby="gateTitle">
-    <h1 id="gateTitle">Admin access</h1>
-    <p>Enter the admin secret. It stays in this tab's memory only. It is never saved, and it is cleared when you lock or reload.</p>
-    <form id="gateForm" autocomplete="off">
-      <label class="f" for="secretInput">Admin secret</label>
-      <div class="row">
-        <input id="secretInput" type="password" autocomplete="off" spellcheck="false" required>
-        <button class="btn navy" type="submit" id="gateBtn">Unlock</button>
-      </div>
-      <div class="err" id="gateErr" role="alert"></div>
-    </form>
-  </section>
+  <section class="gate" id="gate" aria-live="polite"><div id="authBox"></div></section>
 
   <div id="app" hidden>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" id="tab-signups" aria-selected="true" data-tab="signups">Signups <span class="n" id="nSignups">0</span></button>
       <button class="tab" role="tab" id="tab-practices" aria-selected="false" data-tab="practices">Practices <span class="n plain" id="nPractices">0</span></button>
+      <button class="tab" role="tab" id="tab-team" aria-selected="false" data-tab="team" hidden>Team</button>
+      <button class="tab" role="tab" id="tab-activity" aria-selected="false" data-tab="activity" hidden>Activity</button>
     </div>
 
     <section id="view-signups" role="tabpanel" aria-labelledby="tab-signups">
@@ -197,8 +224,52 @@ legend { font-size: 12px; font-weight: 700; letter-spacing: .7px; text-transform
       </div>
       <div class="list" id="practiceList"></div>
     </section>
+
+    <section id="view-team" role="tabpanel" aria-labelledby="tab-team" hidden>
+      <div class="note">
+        <strong>Who can do what.</strong> Everyone signs in with their own email, password and authenticator code, and every change is recorded in <strong>Activity</strong>.
+        <ul style="margin:8px 0 0 18px;padding:0">
+          <li><strong>Owner:</strong> everything, including this Team tab, cancelling accounts, marking accounts active and viewing tax IDs.</li>
+          <li><strong>Manager:</strong> reviews signups, creates and edits practices, extends trials, sends payment links.</li>
+          <li><strong>Support:</strong> read-only, plus resetting a practice user's password.</li>
+        </ul>
+      </div>
+      <div class="bar">
+        <button class="btn primary" type="button" id="inviteBtn">+ Invite admin</button>
+        <span class="spacer"></span>
+        <button class="btn small" type="button" id="refreshTeam">Refresh</button>
+      </div>
+      <div class="list" id="teamList"></div>
+    </section>
+
+    <section id="view-activity" role="tabpanel" aria-labelledby="tab-activity" hidden>
+      <div class="bar">
+        <span class="hint">The latest 200 actions by admins, newest first. Passwords and codes are never recorded.</span>
+        <span class="spacer"></span>
+        <button class="btn small" type="button" id="refreshActivity">Refresh</button>
+      </div>
+      <div id="activityList"></div>
+    </section>
   </div>
 </main>
+
+<!-- Invite admin dialog -->
+<dialog id="inviteDlg" aria-labelledby="inviteTitle">
+  <div class="dlg-head"><h2 id="inviteTitle">Invite an admin</h2><button class="btn small ghost x" type="button" data-close>Close</button></div>
+  <form id="inviteForm" autocomplete="off">
+    <div class="dlg-body" id="inviteBody"></div>
+    <div class="dlg-foot" id="inviteFoot"></div>
+  </form>
+</dialog>
+
+<!-- My account dialog -->
+<dialog id="accountDlg" aria-labelledby="accountTitle">
+  <div class="dlg-head"><h2 id="accountTitle">My account</h2><button class="btn small ghost x" type="button" data-close>Close</button></div>
+  <form id="accountForm" autocomplete="off">
+    <div class="dlg-body" id="accountBody"></div>
+    <div class="dlg-foot" id="accountFoot"></div>
+  </form>
+</dialog>
 
 <!-- Create / review dialog -->
 <dialog id="createDlg" aria-labelledby="createTitle">
@@ -233,8 +304,10 @@ const PROVIDERS   = ['1','2–5','6–10','11–25','25+'];
 const EHRS        = ['athenahealth','Epic','Cerner','eClinicalWorks','NextGen','Kareo / Tebra','Practice Fusion','DrChrono','None / Paper-based','Other'];
 const REFERRALS   = ['Google Search','Colleague / Referral','Social Media','Online Ad','Conference / Event','Other'];
 
-let SECRET = '';
-const state = { tab: 'signups', filter: 'new', signups: [], counts: {}, practices: [], panels: {}, armed: null, busy: new Set() };
+let AUTH = null;   // { type: 'session', token } | { type: 'secret', secret } (emergency)
+let ME = null;     // { id, name, email, role, via, permissions[], roles{} }
+const state = { tab: 'signups', filter: 'new', signups: [], counts: {}, practices: [], panels: {}, armed: null, busy: new Set(),
+                team: [], teamPanels: {}, activity: [] };
 
 const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -249,17 +322,23 @@ function toast(msg, bad = false) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), bad ? 6000 : 3200);
 }
 
-async function api(method, path, body) {
+const authHeaders = () => !AUTH ? {} : AUTH.type === 'session' ? { Authorization: 'Bearer ' + AUTH.token } : { 'x-admin-secret': AUTH.secret };
+
+// noAuth = a sign-in / setup call: a 401 there is just a wrong password or code, not an ended session.
+async function api(method, path, body, { noAuth = false } = {}) {
   let res;
   try {
     res = await fetch(API + path, {
       method,
-      headers: { 'x-admin-secret': SECRET, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+      headers: { ...(noAuth ? {} : authHeaders()), ...(body ? { 'Content-Type': 'application/json' } : {}) },
       body: body ? JSON.stringify(body) : undefined,
     });
   } catch (e) { throw new Error('Could not reach the server. Check your connection.'); }
   let data = null; try { data = await res.json(); } catch (e) { /* non-JSON */ }
-  if (res.status === 403) { lock('The admin secret was rejected.'); throw new Error('Forbidden'); }
+  if (!noAuth && (res.status === 401 || (res.status === 403 && AUTH && AUTH.type === 'secret' && data && data.error === 'Forbidden'))) {
+    signOut(res.status === 401 ? ((data && data.error) || 'Your session has ended. Please sign in again.') : 'The emergency secret was not accepted.');
+    throw new Error('SESSION_ENDED');
+  }
   if (res.status === 429) throw new Error((data && data.error) || 'Too many requests. Wait a few minutes.');
   if (!res.ok) throw new Error((data && data.error) || `Request failed (${res.status})`);
   return data;
@@ -270,29 +349,179 @@ async function copyText(text, btn) {
   catch (e) { toast('Copy blocked: select the text and copy it manually.', true); }
 }
 
-/* ───────── gate ───────── */
-function lock(msg) {
-  SECRET = '';
-  state.signups = []; state.practices = []; state.panels = {};
-  $('#app').hidden = true; $('#gate').hidden = false; $('#lockBtn').hidden = true;
-  $('#secretInput').value = ''; $('#gateErr').textContent = msg || '';
-  closeAllDialogs();
+/* ───────── sign-in: password → authenticator code → session ───────── */
+const SESSION_KEY = 'pp_admin_session';
+const can = p => !!ME && ME.permissions.includes(p);
+const ROLE_NAME = { owner: 'Owner', manager: 'Manager', support: 'Support' };
+const storeSession = t => { try { sessionStorage.setItem(SESSION_KEY, t); } catch (e) { /* private mode */ } };
+const readSession = () => { try { return sessionStorage.getItem(SESSION_KEY); } catch (e) { return null; } };
+const clearSession = () => { try { sessionStorage.removeItem(SESSION_KEY); } catch (e) { /* ignore */ } };
+
+const authCtx = { view: 'signin', message: '', tone: 'err', mfaToken: null, email: '', emergencyEnabled: false, setupToken: null, setup: null, codes: [], done: '' };
+
+function showAuth(view, message = '', tone = 'err') {
+  Object.assign(authCtx, { view, message, tone });
+  $('#app').hidden = true; $('#gate').hidden = false;
+  ['who', 'accountBtn', 'lockBtn', 'emergencyBadge'].forEach(id => { $('#' + id).hidden = true; });
+  $('#gate').classList.toggle('wide', view === 'setup' || view === 'codes');
+  renderAuth();
 }
-async function unlock(secret) {
-  SECRET = secret;
-  await Promise.all([loadSignups(), loadPractices()]);
-  $('#gate').hidden = true; $('#app').hidden = false; $('#lockBtn').hidden = false;
+const authErr = msg => { const el = $('#authErr'); if (el) { el.className = 'err'; el.textContent = msg || ''; } };
+
+function renderAuth() {
+  const box = $('#authBox'), v = authCtx.view;
+  const note = authCtx.message ? (authCtx.tone === 'err' ? `<div class="err" id="authErr" role="alert">${esc(authCtx.message)}</div>`
+    : `<div class="ok-box" role="status" style="margin:14px 0 0">${esc(authCtx.message)}</div><div class="err" id="authErr" role="alert"></div>`) : '<div class="err" id="authErr" role="alert"></div>';
+  const back = '<div class="alt"><a href="#" data-go="signin">← Back to sign in</a></div>';
+  if (v === 'loading') {
+    box.innerHTML = '<h1>One moment…</h1><p>Checking your link.</p>';
+  } else if (v === 'signin') {
+    box.innerHTML = `<h1>Admin sign in</h1>
+      <p>Sign in with your admin account. You'll be asked for a code from your authenticator app.</p>
+      <form id="f-signin">
+        <div><label class="f" for="a-email">Email</label><input id="a-email" type="email" autocomplete="username" required value="${esc(authCtx.email)}"></div>
+        <div><label class="f" for="a-pass">Password</label><input id="a-pass" type="password" autocomplete="current-password" required></div>
+        <button class="btn navy block" type="submit">Continue</button>
+      </form>${note}
+      <div class="alt"><a href="#" data-go="forgot">Forgot password?</a>${authCtx.emergencyEnabled ? ' &nbsp;·&nbsp; <a href="#" data-go="emergency">Emergency access</a>' : ''}</div>`;
+    setTimeout(() => { const el = $(authCtx.email ? '#a-pass' : '#a-email'); if (el) el.focus(); }, 30);
+  } else if (v === 'mfa') {
+    box.innerHTML = `<h1>Enter your code</h1>
+      <p>Open your authenticator app and enter the 6-digit code for <strong>PracticePing Admin</strong>. No phone? Enter one of your recovery codes instead.</p>
+      <form id="f-mfa">
+        <div><label class="f" for="a-code">Code</label><input id="a-code" type="text" inputmode="text" autocomplete="one-time-code" maxlength="20" spellcheck="false" required></div>
+        <button class="btn navy block" type="submit">Sign in</button>
+      </form>${note}<div class="alt"><a href="#" data-go="signin">← Start over</a></div>`;
+    setTimeout(() => { const el = $('#a-code'); if (el) el.focus(); }, 30);
+  } else if (v === 'forgot') {
+    box.innerHTML = authCtx.done
+      ? `<h1>Check your email</h1><div class="ok-box" style="margin:14px 0">${esc(authCtx.done)}</div>${back}`
+      : `<h1>Reset your password</h1>
+      <p>Enter your admin email. If an account exists, we'll email a link that works once and expires in 60 minutes.</p>
+      <form id="f-forgot">
+        <div><label class="f" for="a-email">Email</label><input id="a-email" type="email" autocomplete="username" required value="${esc(authCtx.email)}"></div>
+        <button class="btn navy block" type="submit">Email me a link</button>
+      </form>${note}${back}`;
+  } else if (v === 'emergency') {
+    box.innerHTML = `<h1>Emergency access</h1>
+      <p>For when you cannot sign in with your account, for example if you lost both your phone and your recovery codes. It gives owner-level access and is recorded as "emergency admin secret". The secret stays in this tab's memory only.</p>
+      <form id="f-emergency">
+        <div><label class="f" for="a-secret">Admin secret</label><input id="a-secret" type="password" autocomplete="off" spellcheck="false" required></div>
+        <button class="btn navy block" type="submit">Unlock</button>
+      </form>${note}${back}`;
+    setTimeout(() => { const el = $('#a-secret'); if (el) el.focus(); }, 30);
+  } else if (v === 'setup') {
+    const s = authCtx.setup, isSetup = s.kind === 'setup';
+    const qr = s.needsMfa && /^data:image\/png;base64,/.test(s.qrDataUrl || '');
+    box.innerHTML = `<h1>${isSetup ? 'Set up your admin account' : 'Choose a new password'}</h1>
+      <p><strong>${esc(s.name)}</strong> · ${esc(s.email)}${s.role ? ' · ' + esc(ROLE_NAME[s.role] || s.role) : ''}</p>
+      <form id="f-setup">
+        ${s.needsMfa ? `<h2>1. Connect your authenticator app</h2>
+          <p style="margin:0">Scan this QR code with an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password, Authy…).</p>
+          <div class="qrbox">${qr ? `<img alt="QR code for your authenticator app" src="${s.qrDataUrl}">` : ''}
+            <div class="manual">Can't scan? Enter this key in the app by hand:<code>${esc(s.secret)}</code></div></div>
+          <div><label class="f" for="s-code">6-digit code shown in the app</label><input id="s-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required></div>
+          <h2>2. Choose a password</h2>` : ''}
+        <div><label class="f" for="s-pass">New password</label><input id="s-pass" type="password" autocomplete="new-password" required>
+          <div class="hint">At least 12 characters. A short phrase of a few words works well. Don't include your email address.</div></div>
+        <div><label class="f" for="s-pass2">Confirm new password</label><input id="s-pass2" type="password" autocomplete="new-password" required></div>
+        <button class="btn navy block" type="submit">${isSetup ? 'Finish setup' : 'Save new password'}</button>
+      </form>${note}`;
+    setTimeout(() => { const el = $(s.needsMfa ? '#s-code' : '#s-pass'); if (el) el.focus(); }, 30);
+  } else if (v === 'codes') {
+    box.innerHTML = `<h1>Save your recovery codes</h1>
+      <p>If you ever lose your phone, each of these codes lets you sign in once. Store them in a password manager. <strong>They are shown only now.</strong></p>
+      <div class="stack">
+        <div class="codes">${authCtx.codes.map(c => `<span>${esc(c)}</span>`).join('')}</div>
+        <button class="btn" type="button" data-copy-codes>Copy all codes</button>
+        <label class="check"><input type="checkbox" id="c-saved"> <span>I have saved these codes somewhere safe.</span></label>
+        <button class="btn navy block" type="button" id="c-continue" data-go="signin" disabled>Continue to sign in</button>
+      </div>`;
+  }
+}
+
+$('#authBox').addEventListener('click', e => {
+  const go = e.target.closest('[data-go]');
+  if (go && !go.disabled) { e.preventDefault(); authCtx.done = ''; showAuth(go.dataset.go, authCtx.setup && go.dataset.go === 'signin' && authCtx.view === 'codes' ? 'Setup complete. Sign in with your new password and authenticator code.' : '', 'ok'); return; }
+  if (e.target.closest('[data-copy-codes]')) copyText(authCtx.codes.join('\n'), e.target.closest('[data-copy-codes]'));
+});
+$('#authBox').addEventListener('change', e => { if (e.target.id === 'c-saved') $('#c-continue').disabled = !e.target.checked; });
+$('#authBox').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target, btn = form.querySelector('button[type=submit]');
+  if (btn) btn.disabled = true; authErr('');
+  try {
+    if (form.id === 'f-signin') {
+      authCtx.email = $('#a-email').value.trim();
+      const d = await api('POST', '/api/admin/auth/login', { email: authCtx.email, password: $('#a-pass').value }, { noAuth: true });
+      authCtx.mfaToken = d.mfaToken; showAuth('mfa');
+    } else if (form.id === 'f-mfa') {
+      const d = await api('POST', '/api/admin/auth/verify', { mfaToken: authCtx.mfaToken, code: $('#a-code').value.trim() }, { noAuth: true });
+      AUTH = { type: 'session', token: d.token }; storeSession(d.token); authCtx.mfaToken = null;
+      await enterApp();
+      if (d.recoveryCodesLeft <= 2) toast(`Only ${d.recoveryCodesLeft} recovery code${d.recoveryCodesLeft === 1 ? '' : 's'} left. Ask an owner for a new-phone link to get a fresh set.`, true);
+    } else if (form.id === 'f-forgot') {
+      authCtx.email = $('#a-email').value.trim();
+      const d = await api('POST', '/api/admin/auth/forgot', { email: authCtx.email }, { noAuth: true });
+      authCtx.done = d.message; renderAuth();
+    } else if (form.id === 'f-emergency') {
+      AUTH = { type: 'secret', secret: $('#a-secret').value.trim() };
+      try { await enterApp(); } catch (err) { AUTH = null; throw new Error(err.message === 'SESSION_ENDED' ? 'That secret was not accepted.' : err.message); }
+    } else if (form.id === 'f-setup') {
+      const s = authCtx.setup, pass = $('#s-pass').value;
+      if (pass !== $('#s-pass2').value) throw new Error('The two passwords do not match.');
+      const d = await api('POST', '/api/admin/auth/setup/complete', { token: authCtx.setupToken, password: pass, code: s.needsMfa ? $('#s-code').value.trim() : undefined }, { noAuth: true });
+      authCtx.setupToken = null;
+      if (d.recoveryCodes && d.recoveryCodes.length) { authCtx.codes = d.recoveryCodes; showAuth('codes'); }
+      else { authCtx.setup = null; showAuth('signin', 'Password updated. Sign in with your new password.', 'ok'); }
+    }
+  } catch (err) {
+    if (err.message !== 'SESSION_ENDED') authErr(err.message);
+  } finally { if (btn && btn.isConnected) btn.disabled = false; }
+});
+
+async function enterApp() {
+  ME = await api('GET', '/api/admin/auth/me');
+  state.tab = can('signups:read') ? 'signups' : 'practices';
+  state.armed = null; state.panels = {}; state.teamPanels = {};
+  await Promise.all([can('signups:read') ? loadSignups() : null, can('practices:read') ? loadPractices() : null]);
+  $('#gate').hidden = true; $('#app').hidden = false;
+  $('#who').hidden = false;
+  $('#who').innerHTML = `<span class="nm">${esc(ME.name)}</span><span class="role">${esc(ROLE_NAME[ME.role] || ME.role)}</span>`;
+  $('#lockBtn').hidden = false;
+  $('#accountBtn').hidden = ME.via !== 'session';
+  $('#emergencyBadge').hidden = ME.via !== 'secret';
   render();
 }
-$('#gateForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const btn = $('#gateBtn'); btn.disabled = true; $('#gateErr').textContent = '';
-  try { await unlock($('#secretInput').value.trim()); $('#secretInput').value = ''; }
-  catch (err) { if (err.message !== 'Forbidden') $('#gateErr').textContent = err.message; else $('#gateErr').textContent = 'That secret was not accepted.'; SECRET = ''; }
-  finally { btn.disabled = false; }
-});
-$('#lockBtn').addEventListener('click', () => lock('Locked.'));
+function signOut(msg = '') {
+  AUTH = null; ME = null; clearSession();
+  Object.assign(state, { signups: [], practices: [], panels: {}, team: [], teamPanels: {}, activity: [], armed: null });
+  closeAllDialogs();
+  authCtx.mfaToken = null; authCtx.done = '';
+  showAuth('signin', msg, msg === 'Signed out.' ? 'ok' : 'err');
+}
+$('#lockBtn').addEventListener('click', () => signOut('Signed out.'));
 if (API.startsWith('http://localhost')) $('#envBadge').hidden = false;
+
+// Opened from an emailed link (#setup=… or #reset=…): take the token out of the address bar at once.
+async function startSetup(token) {
+  authCtx.setupToken = token; showAuth('loading');
+  try {
+    authCtx.setup = await api('POST', '/api/admin/auth/setup/start', { token }, { noAuth: true });
+    showAuth('setup');
+  } catch (err) { authCtx.setupToken = null; showAuth('signin', err.message); }
+}
+async function boot() {
+  try { const c = await api('GET', '/api/admin/auth/config', null, { noAuth: true }); authCtx.emergencyEnabled = !!c.emergencySecretEnabled; } catch (e) { /* offline: hide the option */ }
+  const link = /^#(setup|reset)=([A-Za-z0-9_-]{20,100})$/.exec(location.hash);
+  if (link) { history.replaceState(null, '', location.pathname + location.search); return startSetup(link[2]); }
+  const saved = readSession();
+  if (saved) {
+    AUTH = { type: 'session', token: saved };
+    try { await enterApp(); return; } catch (e) { AUTH = null; clearSession(); }
+  }
+  showAuth('signin');
+}
 
 /* ───────── data ───────── */
 async function loadSignups() {
@@ -305,19 +534,196 @@ async function loadPractices() {
 }
 
 /* ───────── tabs & render ───────── */
-document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { state.tab = t.dataset.tab; render(); }));
-$('#refreshSignups').addEventListener('click', async () => { try { await loadSignups(); render(); toast('Refreshed'); } catch (e) { toast(e.message, true); } });
-$('#refreshPractices').addEventListener('click', async () => { try { await loadPractices(); render(); toast('Refreshed'); } catch (e) { toast(e.message, true); } });
+const toastErr = e => { if (e && e.message !== 'SESSION_ENDED') toast(e.message, true); };
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', async () => {
+  state.tab = t.dataset.tab; render();
+  try {
+    if (state.tab === 'team') { await loadTeam(); render(); }
+    if (state.tab === 'activity') { await loadActivity(); render(); }
+  } catch (e) { toastErr(e); }
+}));
+$('#refreshSignups').addEventListener('click', async () => { try { await loadSignups(); render(); toast('Refreshed'); } catch (e) { toastErr(e); } });
+$('#refreshPractices').addEventListener('click', async () => { try { await loadPractices(); render(); toast('Refreshed'); } catch (e) { toastErr(e); } });
+$('#refreshTeam').addEventListener('click', async () => { try { await loadTeam(); render(); toast('Refreshed'); } catch (e) { toastErr(e); } });
+$('#refreshActivity').addEventListener('click', async () => { try { await loadActivity(); render(); toast('Refreshed'); } catch (e) { toastErr(e); } });
 $('#newPractice').addEventListener('click', () => openCreate(null));
 
 function render() {
-  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === state.tab)));
-  $('#view-signups').hidden = state.tab !== 'signups';
-  $('#view-practices').hidden = state.tab !== 'practices';
+  if (!ME) return;
+  const visible = { signups: can('signups:read'), practices: can('practices:read'), team: can('admins:manage'), activity: can('audit:read') };
+  if (!visible[state.tab]) state.tab = visible.signups ? 'signups' : 'practices';
+  document.querySelectorAll('.tab').forEach(t => { t.hidden = !visible[t.dataset.tab]; t.setAttribute('aria-selected', String(t.dataset.tab === state.tab)); });
+  Object.keys(visible).forEach(k => { $('#view-' + k).hidden = state.tab !== k; });
   $('#nSignups').textContent = state.counts.new || 0;
   $('#nSignups').hidden = !(state.counts.new > 0);
   $('#nPractices').textContent = state.practices.length;
+  $('#newPractice').hidden = !can('practices:create');
   renderSignups(); renderPractices();
+  if (state.tab === 'team') renderTeam();
+  if (state.tab === 'activity') renderActivity();
+}
+
+/* ───────── team (owners) ───────── */
+async function loadTeam() { const d = await api('GET', '/api/admin/users'); state.team = d.users; }
+function teamBadges(u) {
+  if (!u.active) return '<span class="badge b-grey">Deactivated</span>';
+  const b = [u.mfa ? '<span class="badge b-green">2-step on</span>' : '<span class="badge b-amber">Setup not finished</span>'];
+  if (u.link_pending) b.push('<span class="badge b-blue">Link sent</span>');
+  return b.join('');
+}
+function teamPanel(id) {
+  const p = state.teamPanels[id]; if (!p) return '';
+  return `<div class="panel"><h4>${p.resetMfa ? 'New-phone link' : 'Link'}</h4>
+    <div class="copyrow"><input readonly aria-label="Link" value="${esc(p.setupLink)}" data-sel><button class="btn small" type="button" data-copy="${esc(p.setupLink)}">Copy</button></div>
+    <div class="hint">${p.emailed ? 'We also emailed this link to them. ' : 'The email could not be sent, so send this link yourself. '}It works once and expires in ${esc(p.expiresInHours)} hours.${p.resetMfa ? ' It connects a new authenticator app, and the old one stops working.' : ''}</div></div>`;
+}
+function renderTeam() {
+  const list = $('#teamList');
+  if (!state.team.length) { list.innerHTML = '<div class="empty">No admin accounts yet.</div>'; return; }
+  list.innerHTML = state.team.map(u => {
+    const you = ME && u.id === ME.id, armed = state.armed && state.armed.id === u.id ? state.armed.act : null;
+    const roleSel = `<select class="inline-select" data-role="${esc(u.id)}" aria-label="Role for ${esc(u.name)}">${['owner', 'manager', 'support'].map(r => `<option value="${r}"${u.role === r ? ' selected' : ''}>${ROLE_NAME[r]}</option>`).join('')}</select>`;
+    const acts = [];
+    if (u.active) {
+      acts.push(`<button class="btn small" type="button" data-tact="link" data-id="${esc(u.id)}">${u.mfa ? 'Send password-reset link' : 'Send setup link again'}</button>`);
+      if (u.mfa) acts.push(armed === 'phone'
+        ? `<button class="btn navy small" type="button" data-tact="phone-go" data-id="${esc(u.id)}">Confirm: reset 2-step</button><button class="btn small ghost" type="button" data-tact="disarm" data-id="${esc(u.id)}">Back</button>`
+        : `<button class="btn small" type="button" data-tact="phone" data-id="${esc(u.id)}">New phone / reset 2-step</button>`);
+      if (!you) acts.push(armed === 'deact'
+        ? `<button class="btn danger armed small" type="button" data-tact="deact-go" data-id="${esc(u.id)}">Confirm: deactivate</button><button class="btn small ghost" type="button" data-tact="disarm" data-id="${esc(u.id)}">Back</button>`
+        : `<button class="btn danger small" type="button" data-tact="deact" data-id="${esc(u.id)}">Deactivate</button>`);
+    } else acts.push(`<button class="btn small" type="button" data-tact="react" data-id="${esc(u.id)}">Reactivate</button>`);
+    return `<article class="card">
+      <div class="card-head">
+        <div><div class="card-title">${esc(u.name)}${you ? ' <span class="hint">(you)</span>' : ''}</div><div class="card-sub">${esc(u.email)}</div></div>
+        <div class="badges">${teamBadges(u)}</div>
+      </div>
+      <dl class="facts">
+        <div class="fact"><dt>Role</dt><dd>${roleSel}</dd></div>
+        <div class="fact"><dt>Last sign-in</dt><dd>${esc(fmtDateTime(u.last_login_at))}</dd></div>
+        <div class="fact"><dt>Added</dt><dd>${esc(fmtDate(u.created_at))}${u.created_by ? ' by ' + esc(u.created_by) : ''}</dd></div>
+      </dl>
+      <div class="actions">${acts.join('')}</div>${teamPanel(u.id)}
+    </article>`;
+  }).join('');
+}
+$('#teamList').addEventListener('click', async e => {
+  const sel = e.target.closest('[data-sel]'); if (sel) { sel.select(); return; }
+  const c = e.target.closest('[data-copy]'); if (c) { copyText(c.dataset.copy, c); return; }
+  const b = e.target.closest('button[data-tact]'); if (!b) return;
+  const id = b.dataset.id, act = b.dataset.tact, u = state.team.find(x => x.id === id); if (!u) return;
+  const refresh = async () => { await loadTeam(); render(); };
+  try {
+    if (act === 'phone' || act === 'deact') { state.armed = { id, act }; return renderTeam(); }
+    if (act === 'disarm') { state.armed = null; return renderTeam(); }
+    state.armed = null;
+    if (act === 'deact-go') { await api('PUT', `/api/admin/users/${id}`, { active: false }); toast(`${u.name} deactivated`); return refresh(); }
+    if (act === 'react') { await api('PUT', `/api/admin/users/${id}`, { active: true }); toast(`${u.name} reactivated. Send them a link so they can sign in.`); return refresh(); }
+    if (act === 'link' || act === 'phone-go') {
+      const r = await api('POST', `/api/admin/users/${id}/link`, { resetMfa: act === 'phone-go' });
+      state.teamPanels[id] = r; toast(r.emailed ? 'Link emailed' : 'Link created. Copy it and send it yourself.'); return refresh();
+    }
+  } catch (err) { toastErr(err); }
+});
+$('#teamList').addEventListener('change', async e => {
+  const s = e.target.closest('select[data-role]'); if (!s) return;
+  const u = state.team.find(x => x.id === s.dataset.role); if (!u || u.role === s.value) return;
+  try { await api('PUT', `/api/admin/users/${u.id}`, { role: s.value }); toast(`${u.name} is now ${ROLE_NAME[s.value]}. They are signed out and will sign in again.`); await loadTeam(); render(); }
+  catch (err) { s.value = u.role; toastErr(err); }
+});
+
+/* invite */
+$('#inviteBtn').addEventListener('click', () => {
+  const roles = (ME && ME.roles) || {};
+  $('#inviteTitle').textContent = 'Invite an admin';
+  $('#inviteBody').innerHTML = `
+    <div class="grid2">
+      <div><label class="f" for="i-name">Name *</label><input id="i-name" required maxlength="255"></div>
+      <div><label class="f" for="i-email">Email *</label><input id="i-email" type="email" required maxlength="255"></div>
+    </div>
+    <fieldset style="margin-top:16px"><legend>Role</legend><div class="roles">${['manager', 'support', 'owner'].map(r => `
+      <label class="roleopt"><input type="radio" name="i-role" value="${r}"${r === 'manager' ? ' checked' : ''}><div><strong>${ROLE_NAME[r]}</strong><span>${esc((roles[r] || '').replace(/^[^—]+—\s*/, ''))}</span></div></label>`).join('')}</div></fieldset>
+    <div class="hint">We email them a link (valid for 24 hours) to choose a password and connect an authenticator app. You can also copy the link and send it yourself.</div>
+    <div class="err" id="inviteErr" role="alert"></div>`;
+  $('#inviteFoot').innerHTML = '<button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="submit" id="inviteSave">Send invitation</button>';
+  $('#inviteDlg').showModal();
+});
+$('#inviteForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const save = $('#inviteSave'); if (!save) return;
+  save.disabled = true; $('#inviteErr').textContent = '';
+  try {
+    const r = await api('POST', '/api/admin/users', { name: $('#i-name').value.trim(), email: $('#i-email').value.trim(), role: document.querySelector('input[name=i-role]:checked').value });
+    $('#inviteTitle').textContent = 'Invitation created';
+    $('#inviteBody').innerHTML = `<div class="ok-box">${esc(r.user.name)} was added as ${esc(ROLE_NAME[r.user.role])}.</div>
+      <div class="${r.emailed ? 'note' : 'warn-box'}" style="margin-top:12px">${r.emailed ? `We emailed an invitation to ${esc(r.user.email)}.` : 'The email could not be sent, so copy the link below and send it yourself.'} The link works once and expires in ${esc(r.expiresInHours)} hours.</div>
+      <div class="copyrow"><input readonly aria-label="Setup link" value="${esc(r.setupLink)}" data-sel><button class="btn small" type="button" data-copy="${esc(r.setupLink)}">Copy</button></div>`;
+    $('#inviteFoot').innerHTML = '<button class="btn primary" type="button" data-close>Done</button>';
+    await loadTeam(); render();
+  } catch (err) { save.disabled = false; if (err.message !== 'SESSION_ENDED') $('#inviteErr').textContent = err.message; }
+});
+$('#inviteDlg').addEventListener('click', e => {
+  const c = e.target.closest('[data-copy]'); if (c) copyText(c.dataset.copy, c);
+  const sel = e.target.closest('[data-sel]'); if (sel) sel.select();
+});
+$('#inviteDlg').addEventListener('close', () => { $('#inviteBody').innerHTML = ''; $('#inviteFoot').innerHTML = ''; });
+
+/* my account */
+$('#accountBtn').addEventListener('click', () => {
+  $('#accountBody').innerHTML = `
+    <p style="margin:0 0 16px"><strong>${esc(ME.name)}</strong><br><span class="hint">${esc(ME.email)} · ${esc(ROLE_NAME[ME.role] || ME.role)}</span></p>
+    <fieldset><legend>Change password</legend><div style="display:grid;gap:12px">
+      <div><label class="f" for="m-cur">Current password</label><input id="m-cur" type="password" autocomplete="current-password" required></div>
+      <div><label class="f" for="m-new">New password</label><input id="m-new" type="password" autocomplete="new-password" required><div class="hint">At least 12 characters. Changing it signs you out of your other devices.</div></div>
+      <div><label class="f" for="m-new2">Confirm new password</label><input id="m-new2" type="password" autocomplete="new-password" required></div>
+    </div></fieldset>
+    <div class="err" id="accountErr" role="alert"></div>`;
+  $('#accountFoot').innerHTML = '<button class="btn danger" type="button" id="logoutAll">Sign out everywhere</button><span style="flex:1"></span><button class="btn" type="button" data-close>Close</button><button class="btn primary" type="submit" id="accountSave">Change password</button>';
+  $('#accountDlg').showModal();
+});
+$('#accountForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const save = $('#accountSave'); if (!save) return;
+  save.disabled = true; $('#accountErr').textContent = '';
+  try {
+    if ($('#m-new').value !== $('#m-new2').value) throw new Error('The two new passwords do not match.');
+    const d = await api('POST', '/api/admin/auth/change-password', { currentPassword: $('#m-cur').value, newPassword: $('#m-new').value });
+    AUTH.token = d.token; storeSession(d.token);
+    $('#accountDlg').close(); toast('Password changed. Your other devices were signed out.');
+  } catch (err) { if (err.message !== 'SESSION_ENDED') $('#accountErr').textContent = err.message; }
+  finally { save.disabled = false; }
+});
+$('#accountDlg').addEventListener('click', async e => {
+  if (!e.target.closest('#logoutAll')) return;
+  try { await api('POST', '/api/admin/auth/logout-all'); signOut('Signed out of every device.'); } catch (err) { toastErr(err); }
+});
+$('#accountDlg').addEventListener('close', () => { $('#accountBody').innerHTML = ''; $('#accountFoot').innerHTML = ''; });
+
+/* ───────── activity (owners) ───────── */
+async function loadActivity() { const d = await api('GET', '/api/admin/audit?limit=200'); state.activity = d.entries; }
+const ACTION_LABELS = {
+  'login': 'Signed in', 'login:failed': 'Failed sign-in (password)', 'mfa:failed': 'Failed authenticator code',
+  'password:change': 'Changed own password', 'password:reset': 'Reset password from link', 'password:reset_requested': 'Asked for a password-reset link',
+  'account:setup': 'Finished account setup', 'logout:all': 'Signed out everywhere',
+  'admin:invite': 'Invited an admin', 'admin:update': 'Changed an admin', 'admin:link_reset': 'Sent an admin a password link', 'admin:link_new_phone': 'Sent an admin a new-phone link',
+  'practices:create': 'Created a practice', 'practices:edit': 'Edited a practice', 'practices:reset_password': 'Reset a practice user\'s password',
+  'signups:write': 'Updated a signup',
+  'subscription:activate': 'Marked a practice active', 'subscription:extend_trial': 'Extended a trial', 'subscription:reset_trial': 'Restarted a trial', 'subscription:cancel': 'Cancelled a practice',
+  'billing:checkout_link': 'Created a payment link', 'billing:portal_link': 'Opened a billing portal link',
+  'sms_registration:view': 'Viewed SMS registration (incl. tax ID)', 'sms_registration:update': 'Updated SMS registration',
+};
+function renderActivity() {
+  const el = $('#activityList');
+  if (!state.activity.length) { el.innerHTML = '<div class="empty">No activity yet.</div>'; return; }
+  el.innerHTML = `<div class="tablewrap"><table class="log"><thead><tr><th>When</th><th>Who</th><th>Action</th><th>Target</th><th>Result</th></tr></thead><tbody>${
+    state.activity.map(a => {
+      const ok = a.status === null || a.status < 400;
+      const label = ACTION_LABELS[a.action] || (a.action.startsWith('denied:') ? 'Blocked: ' + a.action.slice(7) : a.action);
+      return `<tr><td>${esc(fmtDateTime(a.created_at))}</td>
+        <td>${esc(a.admin_email || '—')}${a.role ? ` <span class="badge b-grey">${esc(ROLE_NAME[a.role] || a.role)}</span>` : ''}${a.via === 'secret' ? ' <span class="badge b-amber">emergency</span>' : ''}</td>
+        <td>${esc(label)}<div class="mono hint">${esc(a.action)}</div></td><td class="mono">${esc(a.target || '')}</td>
+        <td><span class="badge ${ok ? 'b-green' : 'b-red'}">${a.status === null ? '—' : esc(a.status)}</span></td></tr>`;
+    }).join('')}</tbody></table></div>`;
 }
 
 /* ───────── signups ───────── */
@@ -329,7 +735,7 @@ function renderSignups() {
   }).join('');
   $('#signupChips').querySelectorAll('.chip').forEach(c => c.addEventListener('click', async () => {
     state.filter = c.dataset.filter;
-    try { await loadSignups(); render(); } catch (e) { toast(e.message, true); }
+    try { await loadSignups(); render(); } catch (e) { toastErr(e); }
   }));
 
   const list = $('#signupList');
@@ -342,8 +748,8 @@ function renderSignups() {
       : s.status === 'dismissed' ? '<span class="badge b-grey">Dismissed</span>' : '<span class="badge b-amber">New</span>';
     const acts = s.status === 'provisioned'
       ? `<button class="btn small" type="button" data-act="goto" data-slug="${esc(s.practice_slug)}">View practice</button>`
-      : `<button class="btn primary small" type="button" data-act="review" data-id="${esc(s.id)}">Review &amp; create practice</button>
-         ${s.status === 'dismissed'
+      : `${can('practices:create') ? `<button class="btn primary small" type="button" data-act="review" data-id="${esc(s.id)}">Review &amp; create practice</button>` : ''}
+         ${!can('signups:write') ? '' : s.status === 'dismissed'
             ? `<button class="btn small" type="button" data-act="restore" data-id="${esc(s.id)}">Restore</button>`
             : `<button class="btn small ghost" type="button" data-act="dismiss" data-id="${esc(s.id)}">Dismiss</button>`}`;
     return `<article class="card" data-id="${esc(s.id)}">
@@ -362,7 +768,7 @@ function renderSignups() {
         <div class="fact"><dt>Heard about us</dt><dd>${esc(s.referral || '—')}</dd></div>
       </dl>
       ${s.status !== 'provisioned' ? `<div style="margin-top:12px"><label class="f" for="note-${esc(s.id)}">Review notes</label>
-        <textarea id="note-${esc(s.id)}" data-note="${esc(s.id)}" placeholder="e.g. verified NPI, called back, wants Epic integration" maxlength="2000">${esc(s.notes || '')}</textarea></div>` : (s.notes ? `<div class="hint" style="margin-top:10px">Notes: ${esc(s.notes)}</div>` : '')}
+        <textarea id="note-${esc(s.id)}" data-note="${esc(s.id)}" placeholder="e.g. verified NPI, called back, wants Epic integration" maxlength="2000"${can('signups:write') ? '' : ' readonly'}>${esc(s.notes || '')}</textarea></div>` : (s.notes ? `<div class="hint" style="margin-top:10px">Notes: ${esc(s.notes)}</div>` : '')}
       <div class="actions">${acts}</div>
     </article>`;
   }).join('');
@@ -377,7 +783,7 @@ $('#signupList').addEventListener('click', async e => {
     b.disabled = true;
     await api('PUT', `/api/admin/signups/${id}`, { status: act === 'dismiss' ? 'dismissed' : 'new', notes: noteValue(id) });
     await loadSignups(); render(); toast(act === 'dismiss' ? 'Dismissed' : 'Restored');
-  } catch (err) { b.disabled = false; toast(err.message, true); }
+  } catch (err) { b.disabled = false; toastErr(err); }
 });
 const noteValue = id => { const t = document.querySelector(`textarea[data-note="${CSS.escape(id)}"]`); return t ? t.value : undefined; };
 $('#signupList').addEventListener('focusout', async e => {
@@ -385,7 +791,7 @@ $('#signupList').addEventListener('focusout', async e => {
   const s = state.signups.find(x => x.id === t.dataset.note);
   if (!s || (s.notes || '') === t.value) return;
   try { await api('PUT', `/api/admin/signups/${s.id}`, { notes: t.value }); s.notes = t.value; toast('Note saved'); }
-  catch (err) { toast(err.message, true); }
+  catch (err) { toastErr(err); }
 });
 
 /* ───────── forms ───────── */
@@ -466,7 +872,7 @@ $('#createForm').addEventListener('submit', async e => {
     const r = await api('POST', '/api/admin/practices', body);
     showCreated(r);
     await Promise.all([loadSignups(), loadPractices()]); render();
-  } catch (err) { save.disabled = false; $('#createErr').textContent = err.message; }
+  } catch (err) { save.disabled = false; if (err.message !== 'SESSION_ENDED') $('#createErr').textContent = err.message; }
 });
 function showCreated(r) {
   const loginUrl = r.loginUrl || 'https://ilipcare.practiceping.com';
@@ -520,7 +926,7 @@ $('#editForm').addEventListener('submit', async e => {
       googleReviewLink: val('f_googleReviewLink'), bookingLink: val('f_bookingLink'), plan: val('f_plan'),
     });
     await loadPractices(); render(); $('#editDlg').close(); toast('Saved');
-  } catch (err) { $('#editErr').textContent = err.message; }
+  } catch (err) { if (err.message !== 'SESSION_ENDED') $('#editErr').textContent = err.message; }
   finally { save.disabled = false; }
 });
 
@@ -555,19 +961,21 @@ function renderPractices() {
     const subscribed = p.billing_status === 'subscribed' && p.has_subscription;
     const dis = busy ? ' disabled' : '';
     const buttons = [];
-    if (!subscribed && p.subscription_status !== 'cancelled') buttons.push(`<button class="btn primary small" type="button" data-act="link"${dis}>Send payment link</button>`);
-    if (!subscribed && p.subscription_status === 'cancelled') buttons.push(`<button class="btn primary small" type="button" data-act="link"${dis}>Payment link (reactivate)</button>`);
-    if (p.has_stripe_customer) buttons.push(`<button class="btn small" type="button" data-act="portal"${dis}>Billing portal</button>`);
-    if (p.subscription_status !== 'active') buttons.push(armed === 'activate'
+    if (can('billing:manage')) {
+      if (!subscribed && p.subscription_status !== 'cancelled') buttons.push(`<button class="btn primary small" type="button" data-act="link"${dis}>Send payment link</button>`);
+      if (!subscribed && p.subscription_status === 'cancelled') buttons.push(`<button class="btn primary small" type="button" data-act="link"${dis}>Payment link (reactivate)</button>`);
+      if (p.has_stripe_customer) buttons.push(`<button class="btn small" type="button" data-act="portal"${dis}>Billing portal</button>`);
+    }
+    if (can('subscription:activate') && p.subscription_status !== 'active') buttons.push(armed === 'activate'
       ? `<button class="btn navy small" type="button" data-act="activate-go"${dis}>Confirm: mark active</button><button class="btn small ghost" type="button" data-act="disarm">Back</button>`
       : `<button class="btn small" type="button" data-act="activate"${dis}>Mark active (paid offline)</button>`);
-    buttons.push(`<span class="inline"><label class="f" for="d-${esc(p.slug)}" style="margin:0">Days</label><input id="d-${esc(p.slug)}" type="number" min="1" max="365" value="30" aria-label="Days to add to the trial"><button class="btn small" type="button" data-act="extend"${dis}>${p.subscription_status === 'trial' ? 'Extend trial' : 'Restart trial'}</button></span>`);
-    buttons.push(`<button class="btn small" type="button" data-act="edit">Edit details</button>`);
-    buttons.push(armed === 'reset'
+    if (can('subscription:trial')) buttons.push(`<span class="inline"><label class="f" for="d-${esc(p.slug)}" style="margin:0">Days</label><input id="d-${esc(p.slug)}" type="number" min="1" max="365" value="30" aria-label="Days to add to the trial"><button class="btn small" type="button" data-act="extend"${dis}>${p.subscription_status === 'trial' ? 'Extend trial' : 'Restart trial'}</button></span>`);
+    if (can('practices:edit')) buttons.push(`<button class="btn small" type="button" data-act="edit">Edit details</button>`);
+    if (can('practices:reset_password')) buttons.push(armed === 'reset'
       ? `<button class="btn navy small" type="button" data-act="reset-go"${dis}>Confirm: reset password</button><button class="btn small ghost" type="button" data-act="disarm">Back</button>`
       : `<button class="btn small" type="button" data-act="reset"${dis}>Reset password</button>`);
-    buttons.push(`<button class="btn small" type="button" data-act="sms"${dis}>SMS registration</button>`);
-    if (p.subscription_status !== 'cancelled') buttons.push(armed === 'cancel'
+    if (can('sms_registration:read')) buttons.push(`<button class="btn small" type="button" data-act="sms"${dis}>SMS registration</button>`);
+    if (can('subscription:cancel') && p.subscription_status !== 'cancelled') buttons.push(armed === 'cancel'
       ? `<button class="btn danger armed small" type="button" data-act="cancel-go"${dis}>Confirm: cancel${p.has_subscription ? ' + stop billing' : ''}</button><button class="btn small ghost" type="button" data-act="disarm">Back</button>`
       : `<button class="btn danger small" type="button" data-act="cancel"${dis}>Cancel account</button>`);
     return `<article class="card" id="p-${esc(p.slug)}" data-slug="${esc(p.slug)}">
@@ -627,8 +1035,8 @@ $('#practiceList').addEventListener('click', async e => {
   const enc = encodeURIComponent(slug);
   const run = async fn => {
     state.busy.add(slug); renderPractices();
-    try { await fn(); } catch (err) { if (err.message !== 'Forbidden') toast(err.message, true); }
-    finally { state.busy.delete(slug); await loadPractices().catch(() => {}); render(); }
+    try { await fn(); } catch (err) { toastErr(err); }
+    finally { state.busy.delete(slug); if (ME) { await loadPractices().catch(() => {}); render(); } }
   };
   if (act === 'edit') return openEdit(p);
   if (act === 'activate' || act === 'cancel' || act === 'reset') { state.armed = { slug, act }; return renderPractices(); }
@@ -667,7 +1075,7 @@ $('#practiceList').addEventListener('click', async e => {
 });
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && state.armed) { state.armed = null; renderPractices(); } });
-$('#secretInput').focus();
+boot();
 </script>
 </body>
 </html>
