@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>PracticePing Admin</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231B5FC4'/%3E%3Ccircle cx='8' cy='16' r='3.2' fill='white'/%3E%3Cpath d='M14 10.5C18 13 18 19 14 21.5' stroke='white' stroke-width='2.4' stroke-linecap='round' fill='none'/%3E%3Cpath d='M18.5 7C25 10.5 25 21.5 18.5 25' stroke='white' stroke-width='2.4' stroke-linecap='round' fill='none' opacity='0.5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --navy: #0B1F3A; --gold: #C8922A; --gold-hover: #B38020;
+  --ground: #EEF1F7; --surface: #FFFFFF; --border: #D4DAE8; --text: #1C2B3A; --muted: #5A6E88;
+  --field: #FFFFFF; --focus: #1B5FC4;
+  --green-bg: #DCFCE7; --green-text: #166534;
+  --amber-bg: #FEF3C7; --amber-text: #92400E;
+  --red-bg: #FEE2E2;   --red-text: #991B1B;
+  --blue-bg: #DBEAFE;  --blue-text: #1E40AF;
+  --grey-bg: #E6EAF2;  --grey-text: #475569;
+  --shadow: 0 1px 2px rgba(11,31,58,.06), 0 4px 16px rgba(11,31,58,.05);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #080F1C; --surface: #0D1E35; --border: #1B3054; --text: #D8E5F5; --muted: #8AA5C8;
+    --field: #0A1830; --focus: #5B9BFF;
+    --green-bg: #042010; --green-text: #4ADE80;
+    --amber-bg: #2A1D05; --amber-text: #FBBF24;
+    --red-bg: #2D0A0A;   --red-text: #F87171;
+    --blue-bg: #0C1E3F;  --blue-text: #93C5FD;
+    --grey-bg: #14233B;  --grey-text: #A3B5CF;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--ground); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-inline: 16px; }
+@media (min-width: 700px) { .wrap { padding-inline: 24px; } }
+
+header.top { background: var(--navy); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
+.top-inner { display: flex; align-items: center; gap: 12px; min-height: 56px; }
+.brand { display: flex; align-items: center; gap: 9px; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: -.3px; }
+.brand .gem { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #1B5FC4, #2E7DE6); display: grid; place-items: center; flex-shrink: 0; }
+.brand .ping { color: var(--gold); }
+.brand .tag { margin-left: 4px; font-size: 11px; font-weight: 600; letter-spacing: 1.1px; text-transform: uppercase; color: rgba(255,255,255,.55); }
+.top-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.env { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: var(--amber-bg); color: var(--amber-text); }
+.btn-top { background: transparent; color: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.25); border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.btn-top:hover { color: #fff; border-color: rgba(255,255,255,.5); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); padding: 8px 14px; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: border-color .15s, background .15s; white-space: nowrap; }
+.btn:hover { border-color: var(--muted); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn.primary { background: var(--gold); border-color: var(--gold); color: #fff; }
+.btn.primary:hover { background: var(--gold-hover); border-color: var(--gold-hover); }
+.btn.navy { background: var(--navy); border-color: var(--navy); color: #fff; }
+.btn.danger { color: var(--red-text); border-color: color-mix(in srgb, var(--red-text) 40%, var(--border)); }
+.btn.danger.armed { background: var(--red-text); color: var(--surface); border-color: var(--red-text); }
+.btn.small { padding: 5px 10px; font-size: 12.5px; }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+
+.gate { max-width: 420px; margin: 72px auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 28px; box-shadow: var(--shadow); }
+.gate h1 { font-size: 20px; letter-spacing: -.2px; margin-bottom: 6px; }
+.gate p { color: var(--muted); font-size: 13.5px; margin-bottom: 18px; }
+.gate .row { display: flex; gap: 8px; }
+.gate .row input { flex: 1; min-width: 0; }
+
+label.f { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+input[type=text], input[type=email], input[type=password], input[type=number], input[type=url], select, textarea {
+  width: 100%; background: var(--field); border: 1.5px solid var(--border); border-radius: 6px; padding: 9px 11px; font-size: 14px; min-width: 0;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--focus); outline: none; }
+textarea { resize: vertical; min-height: 64px; }
+.err { color: var(--red-text); font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 22px 0 18px; overflow-x: auto; }
+.tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 10px 14px; font-weight: 600; font-size: 14.5px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.tab[aria-selected=true] { color: var(--text); border-bottom-color: var(--gold); }
+.tab .n { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 6px; border-radius: 20px; background: var(--gold); color: #fff; font-size: 11.5px; line-height: 20px; text-align: center; }
+.tab .n.plain { background: var(--grey-bg); color: var(--grey-text); }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.bar .spacer { flex: 1; }
+.chip { border: 1px solid var(--border); background: var(--surface); border-radius: 20px; padding: 5px 12px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; }
+.chip[aria-pressed=true] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.note { background: var(--blue-bg); color: var(--blue-text); border-radius: 8px; padding: 12px 14px; font-size: 13.5px; margin-bottom: 16px; }
+.note strong { font-weight: 700; }
+
+.list { display: grid; gap: 12px; padding-bottom: 60px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow); }
+.card-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 12px; }
+.card-title { font-size: 16.5px; font-weight: 700; letter-spacing: -.2px; overflow-wrap: anywhere; }
+.card-sub { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.badges { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
+.badge { font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+.b-green { background: var(--green-bg); color: var(--green-text); }
+.b-amber { background: var(--amber-bg); color: var(--amber-text); }
+.b-red   { background: var(--red-bg);   color: var(--red-text); }
+.b-blue  { background: var(--blue-bg);  color: var(--blue-text); }
+.b-grey  { background: var(--grey-bg);  color: var(--grey-text); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px 20px; margin: 14px 0 4px; }
+.fact dt { font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
+.fact dd { font-size: 14px; overflow-wrap: anywhere; }
+.fact dd a { color: inherit; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.actions .inline { display: inline-flex; align-items: center; gap: 6px; }
+.actions .inline input { width: 64px; padding: 5px 8px; font-size: 13px; }
+.panel { margin-top: 12px; background: var(--ground); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 13.5px; }
+.panel h4 { font-size: 12.5px; letter-spacing: .5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.copyrow { display: flex; gap: 8px; margin-bottom: 8px; }
+.copyrow input { flex: 1; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+.kv { display: grid; grid-template-columns: minmax(120px, 190px) 1fr; gap: 4px 14px; }
+.kv dt { color: var(--muted); font-size: 12.5px; }
+.kv dd { overflow-wrap: anywhere; }
+.empty { text-align: center; color: var(--muted); padding: 48px 16px; background: var(--surface); border: 1px dashed var(--border); border-radius: 10px; }
+
+dialog { margin: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); padding: 0; width: min(720px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); box-shadow: 0 24px 64px rgba(0,0,0,.35); }
+dialog::backdrop { background: rgba(8,15,28,.6); }
+.dlg-head { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 1; }
+.dlg-head h2 { font-size: 17px; letter-spacing: -.2px; }
+.dlg-head .x { margin-left: auto; }
+.dlg-body { padding: 18px 20px 6px; }
+.dlg-foot { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; padding: 14px 20px 18px; }
+fieldset { border: none; padding: 0; margin: 0 0 18px; min-width: 0; }
+legend { font-size: 12px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; color: var(--gold); padding: 0; margin-bottom: 10px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid2 .full { grid-column: 1 / -1; }
+@media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } .kv { grid-template-columns: 1fr; } }
+.hint { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.ok-box { background: var(--green-bg); color: var(--green-text); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-weight: 600; }
+.warn-box { background: var(--amber-bg); color: var(--amber-text); border-radius: 8px; padding: 10px 14px; margin: 12px 0; font-size: 13.5px; }
+
+#toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--navy); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; max-width: min(520px, calc(100vw - 32px)); box-shadow: 0 8px 28px rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 100; }
+#toast.show { opacity: 1; }
+#toast.bad { background: #8B1A1A; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-inner">
+    <div class="brand">
+      <span class="gem"><svg viewBox="0 0 24 24" fill="none" width="16" height="16" aria-hidden="true"><circle cx="6" cy="12" r="2.8" fill="white"/><path d="M11.5 7.5C15 9.8 15 14.2 11.5 16.5" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M15.5 4C22 7.5 22 16.5 15.5 20" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/></svg></span>
+      <span>Practice<span class="ping">Ping</span></span><span class="tag">Admin</span>
+    </div>
+    <div class="top-actions">
+      <span class="env" id="envBadge" hidden>Local API</span>
+      <button class="btn-top" id="lockBtn" type="button" hidden>Lock</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="gate" id="gate" aria-labelledby="gateTitle">
+    <h1 id="gateTitle">Admin access</h1>
+    <p>Enter the admin secret. It stays in this tab's memory only. It is never saved, and it is cleared when you lock or reload.</p>
+    <form id="gateForm" autocomplete="off">
+      <label class="f" for="secretInput">Admin secret</label>
+      <div class="row">
+        <input id="secretInput" type="password" autocomplete="off" spellcheck="false" required>
+        <button class="btn navy" type="submit" id="gateBtn">Unlock</button>
+      </div>
+      <div class="err" id="gateErr" role="alert"></div>
+    </form>
+  </section>
+
+  <div id="app" hidden>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-signups" aria-selected="true" data-tab="signups">Signups <span class="n" id="nSignups">0</span></button>
+      <button class="tab" role="tab" id="tab-practices" aria-selected="false" data-tab="practices">Practices <span class="n plain" id="nPractices">0</span></button>
+    </div>
+
+    <section id="view-signups" role="tabpanel" aria-labelledby="tab-signups">
+      <div class="bar">
+        <div id="signupChips" role="group" aria-label="Filter signups" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+        <span class="spacer"></span>
+        <button class="btn small" type="button" id="refreshSignups">Refresh</button>
+      </div>
+      <div class="list" id="signupList"></div>
+    </section>
+
+    <section id="view-practices" role="tabpanel" aria-labelledby="tab-practices" hidden>
+      <div class="note">
+        <strong>How a practice goes from trial to paid:</strong>
+        review the signup &rarr; create the trial practice &rarr; send the <strong>payment link</strong>. The client enters a card once. They are not charged until the trial ends, then <strong>$199 is charged automatically every month</strong> and the practice switches to Active on its own. A failed payment shows as "Payment failed". Use <strong>Mark active</strong> only for a client who pays you outside the card system.
+      </div>
+      <div class="bar">
+        <button class="btn primary" type="button" id="newPractice">+ New practice</button>
+        <span class="spacer"></span>
+        <button class="btn small" type="button" id="refreshPractices">Refresh</button>
+      </div>
+      <div class="list" id="practiceList"></div>
+    </section>
+  </div>
+</main>
+
+<!-- Create / review dialog -->
+<dialog id="createDlg" aria-labelledby="createTitle">
+  <div class="dlg-head"><h2 id="createTitle">Review &amp; create trial practice</h2><button class="btn small ghost x" type="button" data-close>Close</button></div>
+  <form id="createForm" autocomplete="off">
+    <div class="dlg-body" id="createBody"></div>
+    <div class="dlg-foot" id="createFoot"></div>
+  </form>
+</dialog>
+
+<!-- Edit dialog -->
+<dialog id="editDlg" aria-labelledby="editTitle">
+  <div class="dlg-head"><h2 id="editTitle">Edit practice details</h2><button class="btn small ghost x" type="button" data-close>Close</button></div>
+  <form id="editForm" autocomplete="off">
+    <div class="dlg-body" id="editBody"></div>
+    <div class="dlg-foot">
+      <button class="btn" type="button" data-close>Cancel</button>
+      <button class="btn primary" type="submit" id="editSave">Save changes</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+const API = (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:3001' : 'https://reviewreach-api.azurewebsites.net';
+
+const SPECIALTIES = ['Family Medicine','Internal Medicine','Pediatrics','Dental / Orthodontics','Orthopedics','Dermatology','OB/GYN','Ophthalmology','Chiropractic','Physical Therapy','Mental Health / Psychiatry','Urgent Care','Other'];
+const PROVIDERS   = ['1','2–5','6–10','11–25','25+'];
+const EHRS        = ['athenahealth','Epic','Cerner','eClinicalWorks','NextGen','Kareo / Tebra','Practice Fusion','DrChrono','None / Paper-based','Other'];
+const REFERRALS   = ['Google Search','Colleague / Referral','Social Media','Online Ad','Conference / Event','Other'];
+
+let SECRET = '';
+const state = { tab: 'signups', filter: 'new', signups: [], counts: {}, practices: [], panels: {}, armed: null, busy: new Set() };
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtDate = d => d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+const fmtDateTime = d => d ? new Date(d).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'never';
+const slugify = s => String(s || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+
+let toastTimer;
+function toast(msg, bad = false) {
+  const t = $('#toast');
+  t.textContent = msg; t.classList.toggle('bad', bad); t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), bad ? 6000 : 3200);
+}
+
+async function api(method, path, body) {
+  let res;
+  try {
+    res = await fetch(API + path, {
+      method,
+      headers: { 'x-admin-secret': SECRET, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch (e) { throw new Error('Could not reach the server. Check your connection.'); }
+  let data = null; try { data = await res.json(); } catch (e) { /* non-JSON */ }
+  if (res.status === 403) { lock('The admin secret was rejected.'); throw new Error('Forbidden'); }
+  if (res.status === 429) throw new Error((data && data.error) || 'Too many requests. Wait a few minutes.');
+  if (!res.ok) throw new Error((data && data.error) || `Request failed (${res.status})`);
+  return data;
+}
+
+async function copyText(text, btn) {
+  try { await navigator.clipboard.writeText(text); toast('Copied'); if (btn) { const o = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = o, 1500); } }
+  catch (e) { toast('Copy blocked: select the text and copy it manually.', true); }
+}
+
+/* ───────── gate ───────── */
+function lock(msg) {
+  SECRET = '';
+  state.signups = []; state.practices = []; state.panels = {};
+  $('#app').hidden = true; $('#gate').hidden = false; $('#lockBtn').hidden = true;
+  $('#secretInput').value = ''; $('#gateErr').textContent = msg || '';
+  closeAllDialogs();
+}
+async function unlock(secret) {
+  SECRET = secret;
+  await Promise.all([loadSignups(), loadPractices()]);
+  $('#gate').hidden = true; $('#app').hidden = false; $('#lockBtn').hidden = false;
+  render();
+}
+$('#gateForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('#gateBtn'); btn.disabled = true; $('#gateErr').textContent = '';
+  try { await unlock($('#secretInput').value.trim()); $('#secretInput').value = ''; }
+  catch (err) { if (err.message !== 'Forbidden') $('#gateErr').textContent = err.message; else $('#gateErr').textContent = 'That secret was not accepted.'; SECRET = ''; }
+  finally { btn.disabled = false; }
+});
+$('#lockBtn').addEventListener('click', () => lock('Locked.'));
+if (API.startsWith('http://localhost')) $('#envBadge').hidden = false;
+
+/* ───────── data ───────── */
+async function loadSignups() {
+  const d = await api('GET', `/api/admin/signups?status=${encodeURIComponent(state.filter)}`);
+  state.signups = d.signups; state.counts = d.counts || {};
+}
+async function loadPractices() {
+  const d = await api('GET', '/api/admin/practices');
+  state.practices = d.practices;
+}
+
+/* ───────── tabs & render ───────── */
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { state.tab = t.dataset.tab; render(); }));
+$('#refreshSignups').addEventListener('click', async () => { try { await loadSignups(); render(); toast('Refreshed'); } catch (e) { toast(e.message, true); } });
+$('#refreshPractices').addEventListener('click', async () => { try { await loadPractices(); render(); toast('Refreshed'); } catch (e) { toast(e.message, true); } });
+$('#newPractice').addEventListener('click', () => openCreate(null));
+
+function render() {
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === state.tab)));
+  $('#view-signups').hidden = state.tab !== 'signups';
+  $('#view-practices').hidden = state.tab !== 'practices';
+  $('#nSignups').textContent = state.counts.new || 0;
+  $('#nSignups').hidden = !(state.counts.new > 0);
+  $('#nPractices').textContent = state.practices.length;
+  renderSignups(); renderPractices();
+}
+
+/* ───────── signups ───────── */
+function renderSignups() {
+  const chips = [['new', 'New'], ['provisioned', 'Created'], ['dismissed', 'Dismissed'], ['all', 'All']];
+  $('#signupChips').innerHTML = chips.map(([k, label]) => {
+    const n = k === 'all' ? Object.values(state.counts).reduce((a, b) => a + b, 0) : (state.counts[k] || 0);
+    return `<button class="chip" type="button" data-filter="${k}" aria-pressed="${state.filter === k}">${label} (${n})</button>`;
+  }).join('');
+  $('#signupChips').querySelectorAll('.chip').forEach(c => c.addEventListener('click', async () => {
+    state.filter = c.dataset.filter;
+    try { await loadSignups(); render(); } catch (e) { toast(e.message, true); }
+  }));
+
+  const list = $('#signupList');
+  if (!state.signups.length) {
+    list.innerHTML = `<div class="empty">${state.filter === 'new' ? 'No new signups. They appear here as soon as someone submits the trial form on practiceping.com.' : 'Nothing here.'}</div>`;
+    return;
+  }
+  list.innerHTML = state.signups.map(s => {
+    const badge = s.status === 'provisioned' ? '<span class="badge b-green">Practice created</span>'
+      : s.status === 'dismissed' ? '<span class="badge b-grey">Dismissed</span>' : '<span class="badge b-amber">New</span>';
+    const acts = s.status === 'provisioned'
+      ? `<button class="btn small" type="button" data-act="goto" data-slug="${esc(s.practice_slug)}">View practice</button>`
+      : `<button class="btn primary small" type="button" data-act="review" data-id="${esc(s.id)}">Review &amp; create practice</button>
+         ${s.status === 'dismissed'
+            ? `<button class="btn small" type="button" data-act="restore" data-id="${esc(s.id)}">Restore</button>`
+            : `<button class="btn small ghost" type="button" data-act="dismiss" data-id="${esc(s.id)}">Dismiss</button>`}`;
+    return `<article class="card" data-id="${esc(s.id)}">
+      <div class="card-head">
+        <div><div class="card-title">${esc(s.business_name)}</div><div class="card-sub">Submitted ${esc(fmtDateTime(s.created_at))}</div></div>
+        <div class="badges">${badge}</div>
+      </div>
+      <dl class="facts">
+        <div class="fact"><dt>Contact</dt><dd>${esc(s.contact_name)}</dd></div>
+        <div class="fact"><dt>Email</dt><dd><a href="mailto:${esc(s.email)}">${esc(s.email)}</a></dd></div>
+        <div class="fact"><dt>Phone</dt><dd>${esc(s.phone || '—')}</dd></div>
+        <div class="fact"><dt>Address</dt><dd>${esc([s.address, s.city].filter(Boolean).join(', ') || '—')}</dd></div>
+        <div class="fact"><dt>Specialty</dt><dd>${esc(s.specialty || '—')}</dd></div>
+        <div class="fact"><dt>Providers</dt><dd>${esc(s.providers || '—')}</dd></div>
+        <div class="fact"><dt>EHR / software</dt><dd>${esc(s.ehr || '—')}</dd></div>
+        <div class="fact"><dt>Heard about us</dt><dd>${esc(s.referral || '—')}</dd></div>
+      </dl>
+      ${s.status !== 'provisioned' ? `<div style="margin-top:12px"><label class="f" for="note-${esc(s.id)}">Review notes</label>
+        <textarea id="note-${esc(s.id)}" data-note="${esc(s.id)}" placeholder="e.g. verified NPI, called back, wants Epic integration" maxlength="2000">${esc(s.notes || '')}</textarea></div>` : (s.notes ? `<div class="hint" style="margin-top:10px">Notes: ${esc(s.notes)}</div>` : '')}
+      <div class="actions">${acts}</div>
+    </article>`;
+  }).join('');
+}
+$('#signupList').addEventListener('click', async e => {
+  const b = e.target.closest('button[data-act]'); if (!b) return;
+  const id = b.dataset.id, act = b.dataset.act;
+  if (act === 'goto') { state.tab = 'practices'; render(); document.getElementById('p-' + b.dataset.slug)?.scrollIntoView({ block: 'center' }); return; }
+  const s = state.signups.find(x => x.id === id); if (!s) return;
+  if (act === 'review') { openCreate(s); return; }
+  try {
+    b.disabled = true;
+    await api('PUT', `/api/admin/signups/${id}`, { status: act === 'dismiss' ? 'dismissed' : 'new', notes: noteValue(id) });
+    await loadSignups(); render(); toast(act === 'dismiss' ? 'Dismissed' : 'Restored');
+  } catch (err) { b.disabled = false; toast(err.message, true); }
+});
+const noteValue = id => { const t = document.querySelector(`textarea[data-note="${CSS.escape(id)}"]`); return t ? t.value : undefined; };
+$('#signupList').addEventListener('focusout', async e => {
+  const t = e.target.closest('textarea[data-note]'); if (!t) return;
+  const s = state.signups.find(x => x.id === t.dataset.note);
+  if (!s || (s.notes || '') === t.value) return;
+  try { await api('PUT', `/api/admin/signups/${s.id}`, { notes: t.value }); s.notes = t.value; toast('Note saved'); }
+  catch (err) { toast(err.message, true); }
+});
+
+/* ───────── forms ───────── */
+function selectHtml(id, options, value, placeholder) {
+  const opts = options.slice();
+  if (value && !opts.includes(value)) opts.unshift(value);
+  return `<select id="${id}" name="${id}"><option value="">${esc(placeholder)}</option>${opts.map(o => `<option value="${esc(o)}"${o === value ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+}
+function profileFields(v) {
+  return `
+  <fieldset><legend>Practice</legend><div class="grid2">
+    <div class="full"><label class="f" for="f_name">Practice name *</label><input id="f_name" name="name" type="text" value="${esc(v.name)}" required maxlength="255"></div>
+    <div><label class="f" for="f_specialty">Specialty</label>${selectHtml('f_specialty', SPECIALTIES, v.specialty, 'Select…')}</div>
+    <div><label class="f" for="f_providers">Number of providers</label>${selectHtml('f_providers', PROVIDERS, v.providerCount, 'Select…')}</div>
+    <div><label class="f" for="f_ehr">Current EHR / software</label>${selectHtml('f_ehr', EHRS, v.ehr, 'Select…')}</div>
+    <div><label class="f" for="f_referral">How they heard about us</label>${selectHtml('f_referral', REFERRALS, v.referralSource, 'Select…')}</div>
+  </div></fieldset>
+  <fieldset><legend>Contact &amp; address</legend><div class="grid2">
+    <div><label class="f" for="f_contactName">Contact name</label><input id="f_contactName" type="text" value="${esc(v.contactName)}" maxlength="255"></div>
+    <div><label class="f" for="f_contactEmail">Contact email</label><input id="f_contactEmail" type="email" value="${esc(v.contactEmail)}" maxlength="255"></div>
+    <div><label class="f" for="f_contactPhone">Phone</label><input id="f_contactPhone" type="text" value="${esc(v.contactPhone)}" maxlength="50"></div>
+    <div><label class="f" for="f_address">Street address</label><input id="f_address" type="text" value="${esc(v.address)}" maxlength="255"></div>
+    <div class="full"><label class="f" for="f_cityStateZip">City, state, ZIP</label><input id="f_cityStateZip" type="text" value="${esc(v.cityStateZip)}" maxlength="255"></div>
+  </div></fieldset>`;
+}
+const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+
+/* create */
+let createCtx = null;
+function openCreate(signup) {
+  createCtx = { signup };
+  $('#editBody').innerHTML = '';
+  const s = signup || {};
+  const v = {
+    name: s.business_name || '', specialty: s.specialty || '', providerCount: s.providers || '', ehr: s.ehr || '', referralSource: s.referral || '',
+    contactName: s.contact_name || '', contactEmail: s.email || '', contactPhone: s.phone || '', address: s.address || '', cityStateZip: s.city || '',
+  };
+  $('#createTitle').textContent = signup ? 'Review & create trial practice' : 'New trial practice';
+  $('#createBody').innerHTML = `
+    ${signup ? '<div class="note" style="margin-bottom:16px">Pre-filled from the website signup. Check and correct anything before you create the account.</div>' : ''}
+    ${profileFields(v)}
+    <fieldset><legend>Admin login for the practice</legend><div class="grid2">
+      <div><label class="f" for="f_adminName">Admin name *</label><input id="f_adminName" type="text" value="${esc(v.contactName)}" required maxlength="255"></div>
+      <div><label class="f" for="f_adminEmail">Admin email (their login) *</label><input id="f_adminEmail" type="email" value="${esc(v.contactEmail)}" required maxlength="255"></div>
+    </div><div class="hint">A temporary password is generated and shown once after you create the account. Nothing is emailed automatically.</div></fieldset>
+    <fieldset><legend>Trial &amp; plan</legend><div class="grid2">
+      <div><label class="f" for="f_trialDays">Trial length (days)</label><input id="f_trialDays" type="number" min="1" max="365" value="90"></div>
+      <div><label class="f" for="f_plan">Plan</label><select id="f_plan"><option value="professional" selected>Professional</option><option value="starter">Starter</option><option value="enterprise">Enterprise</option></select></div>
+      <div><label class="f" for="f_dataSource">Patient data source</label><select id="f_dataSource"><option value="imported" selected>CSV / email import</option><option value="athena">athenahealth API</option></select></div>
+      <div><label class="f" for="f_slug">Short name (URL slug)</label><input id="f_slug" type="text" value="${esc(slugify(v.name))}" maxlength="60"></div>
+    </div></fieldset>
+    <fieldset><legend>Links &amp; notes</legend><div class="grid2">
+      <div class="full"><label class="f" for="f_googleReviewLink">Google review link</label><input id="f_googleReviewLink" type="url" placeholder="https://g.page/r/…/review" maxlength="1000"></div>
+      <div class="full"><label class="f" for="f_bookingLink">Booking link</label><input id="f_bookingLink" type="url" maxlength="1000"></div>
+      <div class="full"><label class="f" for="f_internalNotes">Internal notes (never shown to the practice)</label><textarea id="f_internalNotes" maxlength="5000">${esc(s.notes || '')}</textarea></div>
+    </div></fieldset>
+    <div class="err" id="createErr" role="alert"></div>`;
+  $('#createFoot').innerHTML = `<button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="submit" id="createSave">Create trial practice</button>`;
+  let slugTouched = false;
+  $('#f_slug').addEventListener('input', () => slugTouched = true);
+  $('#f_name').addEventListener('input', e => { if (!slugTouched) $('#f_slug').value = slugify(e.target.value); });
+  $('#createDlg').showModal();
+}
+$('#createForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const save = $('#createSave'); if (!save) return;
+  save.disabled = true; $('#createErr').textContent = '';
+  const body = {
+    name: val('f_name'), slug: val('f_slug') || undefined, adminEmail: val('f_adminEmail'), adminName: val('f_adminName'),
+    trialDays: Number(val('f_trialDays') || 90), plan: val('f_plan'), dataSource: val('f_dataSource'),
+    contactName: val('f_contactName'), contactEmail: val('f_contactEmail'), contactPhone: val('f_contactPhone'),
+    address: val('f_address'), cityStateZip: val('f_cityStateZip'), specialty: val('f_specialty'), providerCount: val('f_providers'),
+    ehr: val('f_ehr'), referralSource: val('f_referral'), internalNotes: val('f_internalNotes'),
+    googleReviewLink: val('f_googleReviewLink') || undefined, bookingLink: val('f_bookingLink') || undefined,
+    signupId: createCtx && createCtx.signup ? createCtx.signup.id : undefined,
+  };
+  try {
+    const r = await api('POST', '/api/admin/practices', body);
+    showCreated(r);
+    await Promise.all([loadSignups(), loadPractices()]); render();
+  } catch (err) { save.disabled = false; $('#createErr').textContent = err.message; }
+});
+function showCreated(r) {
+  const loginUrl = r.loginUrl || 'https://ilipcare.practiceping.com';
+  const welcome = `Hi ${r.admin.name},\n\nYour PracticePing trial for ${r.practice.name} is ready.\n\nLog in: ${loginUrl}\nEmail: ${r.admin.email}\nTemporary password: ${r.admin.temporaryPassword}\n\nYour free trial runs until ${fmtDate(r.practice.trial_ends_at)}. No card is needed until then.\n\nReply to this email if you need anything.\n\nThe PracticePing Team`;
+  $('#createTitle').textContent = 'Practice created';
+  $('#createBody').innerHTML = `
+    <div class="ok-box">${esc(r.practice.name)} is set up with a trial until ${esc(fmtDate(r.practice.trial_ends_at))}.</div>
+    <div class="warn-box"><strong>Save the password now.</strong> It is shown only once and is not stored anywhere readable. If it is lost, ask for a reset.</div>
+    <div class="copyrow"><input readonly aria-label="Login URL" value="${esc(loginUrl)}" data-sel><button class="btn small" type="button" data-copy="${esc(loginUrl)}">Copy</button></div>
+    <div class="copyrow"><input readonly aria-label="Admin email" value="${esc(r.admin.email)}" data-sel><button class="btn small" type="button" data-copy="${esc(r.admin.email)}">Copy</button></div>
+    <div class="copyrow"><input readonly aria-label="Temporary password" value="${esc(r.admin.temporaryPassword)}" data-sel><button class="btn small" type="button" data-copy="${esc(r.admin.temporaryPassword)}">Copy</button></div>
+    <label class="f" for="welcomeMsg" style="margin-top:14px">Welcome message (copy and send it yourself)</label>
+    <textarea id="welcomeMsg" readonly rows="9">${esc(welcome)}</textarea>`;
+  $('#createFoot').innerHTML = `<button class="btn" type="button" data-copy-welcome>Copy welcome message</button><button class="btn primary" type="button" data-close data-go-practices>Done</button>`;
+  $('#createDlg').dataset.welcome = welcome;
+}
+$('#createDlg').addEventListener('click', e => {
+  const c = e.target.closest('[data-copy]'); if (c) copyText(c.dataset.copy, c);
+  if (e.target.closest('[data-copy-welcome]')) copyText($('#createDlg').dataset.welcome || '', e.target.closest('[data-copy-welcome]'));
+  if (e.target.closest('[data-go-practices]')) { state.tab = 'practices'; render(); }
+  const sel = e.target.closest('[data-sel]'); if (sel) sel.select();
+});
+
+/* edit */
+let editSlug = null;
+function openEdit(p) {
+  editSlug = p.slug;
+  $('#createBody').innerHTML = '';
+  $('#editTitle').textContent = 'Edit ' + p.name;
+  $('#editBody').innerHTML = `${profileFields({ name: p.name, specialty: p.specialty, providerCount: p.provider_count, ehr: p.ehr, referralSource: p.referral_source,
+    contactName: p.contact_name, contactEmail: p.contact_email, contactPhone: p.contact_phone, address: p.address, cityStateZip: p.city_state_zip })}
+    <fieldset><legend>Plan, links &amp; notes</legend><div class="grid2">
+      <div><label class="f" for="f_plan">Plan</label><select id="f_plan">${['starter','professional','enterprise'].map(x => `<option value="${x}"${p.plan === x ? ' selected' : ''}>${x[0].toUpperCase() + x.slice(1)}</option>`).join('')}</select></div>
+      <div></div>
+      <div class="full"><label class="f" for="f_googleReviewLink">Google review link</label><input id="f_googleReviewLink" type="url" value="${esc(p.google_review_link)}" maxlength="1000"></div>
+      <div class="full"><label class="f" for="f_bookingLink">Booking link</label><input id="f_bookingLink" type="url" value="${esc(p.booking_link)}" maxlength="1000"></div>
+      <div class="full"><label class="f" for="f_internalNotes">Internal notes</label><textarea id="f_internalNotes" maxlength="5000">${esc(p.internal_notes)}</textarea></div>
+    </div><div class="hint">The practice name and login email cannot be changed here.</div></fieldset>
+    <div class="err" id="editErr" role="alert"></div>`;
+  $('#f_name').readOnly = true;
+  $('#editDlg').showModal();
+}
+$('#editForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const save = $('#editSave'); save.disabled = true; $('#editErr').textContent = '';
+  try {
+    await api('PUT', `/api/admin/practices/${encodeURIComponent(editSlug)}`, {
+      contactName: val('f_contactName'), contactEmail: val('f_contactEmail'), contactPhone: val('f_contactPhone'),
+      address: val('f_address'), cityStateZip: val('f_cityStateZip'), specialty: val('f_specialty'), providerCount: val('f_providers'),
+      ehr: val('f_ehr'), referralSource: val('f_referral'), internalNotes: val('f_internalNotes'),
+      googleReviewLink: val('f_googleReviewLink'), bookingLink: val('f_bookingLink'), plan: val('f_plan'),
+    });
+    await loadPractices(); render(); $('#editDlg').close(); toast('Saved');
+  } catch (err) { $('#editErr').textContent = err.message; }
+  finally { save.disabled = false; }
+});
+
+function closeAllDialogs() { document.querySelectorAll('dialog[open]').forEach(d => d.close()); }
+// Both dialogs reuse the same field ids, so never leave one populated while the other is open.
+$('#createDlg').addEventListener('close', () => { $('#createBody').innerHTML = ''; $('#createFoot').innerHTML = ''; });
+$('#editDlg').addEventListener('close', () => { $('#editBody').innerHTML = ''; });
+document.addEventListener('click', e => { if (e.target.closest('[data-close]')) e.target.closest('dialog').close(); });
+
+/* ───────── practices ───────── */
+function statusBadge(p) {
+  const left = p.trial_ends_at ? Math.ceil((new Date(p.trial_ends_at) - Date.now()) / 86400000) : null;
+  if (p.subscription_status === 'active') return '<span class="badge b-green">Active</span>';
+  if (p.subscription_status === 'cancelled') return '<span class="badge b-red">Cancelled</span>';
+  if (left !== null && left < 0) return '<span class="badge b-red">Trial expired</span>';
+  return `<span class="badge ${left !== null && left <= 14 ? 'b-amber' : 'b-blue'}">Trial${left !== null ? ` · ${left} day${left === 1 ? '' : 's'} left` : ''}</span>`;
+}
+function billingBadge(p) {
+  return ({
+    none: '<span class="badge b-grey">No card on file</span>',
+    pending: '<span class="badge b-amber">Payment link sent</span>',
+    subscribed: '<span class="badge b-green">Subscribed · renews monthly</span>',
+    past_due: '<span class="badge b-red">Payment failed</span>',
+    canceled: '<span class="badge b-grey">Billing cancelled</span>',
+  })[p.billing_status] || '';
+}
+function renderPractices() {
+  const list = $('#practiceList');
+  if (!state.practices.length) { list.innerHTML = '<div class="empty">No practices yet. Create one from a signup.</div>'; return; }
+  list.innerHTML = state.practices.map(p => {
+    const busy = state.busy.has(p.slug), armed = state.armed && state.armed.slug === p.slug ? state.armed.act : null;
+    const subscribed = p.billing_status === 'subscribed' && p.has_subscription;
+    const dis = busy ? ' disabled' : '';
+    const buttons = [];
+    if (!subscribed && p.subscription_status !== 'cancelled') buttons.push(`<button class="btn primary small" type="button" data-act="link"${dis}>Send payment link</button>`);
+    if (!subscribed && p.subscription_status === 'cancelled') buttons.push(`<button class="btn primary small" type="button" data-act="link"${dis}>Payment link (reactivate)</button>`);
+    if (p.has_stripe_customer) buttons.push(`<button class="btn small" type="button" data-act="portal"${dis}>Billing portal</button>`);
+    if (p.subscription_status !== 'active') buttons.push(armed === 'activate'
+      ? `<button class="btn navy small" type="button" data-act="activate-go"${dis}>Confirm: mark active</button><button class="btn small ghost" type="button" data-act="disarm">Back</button>`
+      : `<button class="btn small" type="button" data-act="activate"${dis}>Mark active (paid offline)</button>`);
+    buttons.push(`<span class="inline"><label class="f" for="d-${esc(p.slug)}" style="margin:0">Days</label><input id="d-${esc(p.slug)}" type="number" min="1" max="365" value="30" aria-label="Days to add to the trial"><button class="btn small" type="button" data-act="extend"${dis}>${p.subscription_status === 'trial' ? 'Extend trial' : 'Restart trial'}</button></span>`);
+    buttons.push(`<button class="btn small" type="button" data-act="edit">Edit details</button>`);
+    buttons.push(`<button class="btn small" type="button" data-act="sms"${dis}>SMS registration</button>`);
+    if (p.subscription_status !== 'cancelled') buttons.push(armed === 'cancel'
+      ? `<button class="btn danger armed small" type="button" data-act="cancel-go"${dis}>Confirm: cancel${p.has_subscription ? ' + stop billing' : ''}</button><button class="btn small ghost" type="button" data-act="disarm">Back</button>`
+      : `<button class="btn danger small" type="button" data-act="cancel"${dis}>Cancel account</button>`);
+    return `<article class="card" id="p-${esc(p.slug)}" data-slug="${esc(p.slug)}">
+      <div class="card-head">
+        <div><div class="card-title">${esc(p.name)}</div><div class="card-sub">${esc(p.slug)} · created ${esc(fmtDate(p.created_at))} · ${esc(p.plan)}</div></div>
+        <div class="badges">${statusBadge(p)}${billingBadge(p)}</div>
+      </div>
+      <dl class="facts">
+        <div class="fact"><dt>Admin login</dt><dd>${esc(p.admin_email || '—')}</dd></div>
+        <div class="fact"><dt>Last login</dt><dd>${esc(fmtDateTime(p.last_login_at))}</dd></div>
+        <div class="fact"><dt>Messages sent</dt><dd>${esc(p.messages_sent)}</dd></div>
+        <div class="fact"><dt>${p.subscription_status === 'active' ? 'Paid since' : 'Trial ends'}</dt><dd>${esc(p.subscription_status === 'active' ? fmtDate(p.subscription_starts_at) : fmtDate(p.trial_ends_at))}</dd></div>
+        <div class="fact"><dt>Contact</dt><dd>${esc(p.contact_name || '—')}${p.contact_phone ? ' · ' + esc(p.contact_phone) : ''}</dd></div>
+        <div class="fact"><dt>Specialty · providers</dt><dd>${esc([p.specialty, p.provider_count].filter(Boolean).join(' · ') || '—')}</dd></div>
+        <div class="fact"><dt>EHR</dt><dd>${esc(p.ehr || '—')}</dd></div>
+        <div class="fact"><dt>Address</dt><dd>${esc([p.address, p.city_state_zip].filter(Boolean).join(', ') || '—')}</dd></div>
+      </dl>
+      ${p.internal_notes ? `<div class="hint" style="margin-top:10px"><strong>Notes:</strong> ${esc(p.internal_notes)}</div>` : ''}
+      <div class="actions">${buttons.join('')}</div>
+      ${panelHtml(p.slug)}
+    </article>`;
+  }).join('');
+}
+function panelHtml(slug) {
+  const pn = state.panels[slug]; if (!pn) return '';
+  if (pn.type === 'link') return `<div class="panel"><h4>Payment link</h4>
+    <div class="copyrow"><input readonly value="${esc(pn.url)}" aria-label="Payment link" data-sel><button class="btn small" type="button" data-copy="${esc(pn.url)}">Copy</button>${pn.url.startsWith('https://') ? `<a class="btn small" href="${esc(pn.url)}" target="_blank" rel="noopener noreferrer">Open</a>` : ''}</div>
+    <div class="hint">${pn.firstChargeAt === 'at checkout' ? 'The card is charged at checkout, then every month.' : `Card is collected now. First charge of ${esc(money(pn.amountCents))} on ${esc(fmtDate(pn.firstChargeAt))}, then every month.`} Link expires ${esc(fmtDateTime(pn.expiresAt))}. Send it to the client yourself.</div></div>`;
+  if (pn.type === 'portal') return `<div class="panel"><h4>Billing portal</h4>
+    <div class="copyrow"><input readonly value="${esc(pn.url)}" aria-label="Billing portal link" data-sel><button class="btn small" type="button" data-copy="${esc(pn.url)}">Copy</button>${pn.url.startsWith('https://') ? `<a class="btn small" href="${esc(pn.url)}" target="_blank" rel="noopener noreferrer">Open</a>` : ''}</div>
+    <div class="hint">Stripe-hosted page to update the card, view invoices or cancel. Anyone with this link can manage the subscription, so only send it to the client.</div></div>`;
+  if (pn.type === 'sms') {
+    const reg = pn.registration || {};
+    const rows = Object.entries(reg).filter(([, v]) => v !== null && v !== '' && typeof v !== 'object').map(([k, v]) => `<dt>${esc(k.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').replace(/^./, c => c.toUpperCase()))}</dt><dd>${esc(v)}</dd>`).join('');
+    return `<div class="panel"><h4>SMS registration (A2P)</h4>${rows ? `<dl class="kv">${rows}</dl>` : '<div class="hint">The practice has not submitted SMS registration details yet.</div>'}
+      <div class="hint" style="margin-top:8px">This can include the tax ID. Do not screenshot or share it.</div></div>`;
+  }
+  return '';
+}
+const money = c => c ? `$${(c / 100).toFixed(2)}` : 'the plan price';
+
+$('#practiceList').addEventListener('click', async e => {
+  const sel = e.target.closest('[data-sel]'); if (sel) { sel.select(); return; }
+  const c = e.target.closest('[data-copy]'); if (c) { copyText(c.dataset.copy, c); return; }
+  const b = e.target.closest('button[data-act]'); if (!b) return;
+  const card = b.closest('article'), slug = card.dataset.slug, p = state.practices.find(x => x.slug === slug), act = b.dataset.act;
+  if (!p) return;
+  const enc = encodeURIComponent(slug);
+  const run = async fn => {
+    state.busy.add(slug); renderPractices();
+    try { await fn(); } catch (err) { if (err.message !== 'Forbidden') toast(err.message, true); }
+    finally { state.busy.delete(slug); await loadPractices().catch(() => {}); render(); }
+  };
+  if (act === 'edit') return openEdit(p);
+  if (act === 'activate' || act === 'cancel') { state.armed = { slug, act }; return renderPractices(); }
+  if (act === 'disarm') { state.armed = null; return renderPractices(); }
+  if (act === 'activate-go') { state.armed = null; return run(async () => { await api('POST', '/api/admin/subscription', { slug, action: 'activate' }); toast(`${p.name} marked active`); }); }
+  if (act === 'cancel-go') return run(async () => {
+    state.armed = null;
+    const r = await api('POST', '/api/admin/subscription', { slug, action: 'cancel' });
+    if (r.stripeSubscriptionCancelled === false) toast('Account cancelled, but the Stripe subscription could NOT be cancelled. Cancel it in the Stripe dashboard.', true);
+    else toast(`${p.name} cancelled`);
+  });
+  if (act === 'extend') return run(async () => {
+    const days = Number(document.getElementById('d-' + slug).value);
+    if (!Number.isInteger(days) || days < 1 || days > 365) throw new Error('Enter a whole number of days from 1 to 365.');
+    const r = await api('POST', '/api/admin/subscription', { slug, action: p.subscription_status === 'trial' ? 'extend_trial' : 'reset_trial', trialDays: days });
+    toast(`Trial now ends ${fmtDate(r.practice.trial_ends_at)}`);
+  });
+  if (act === 'link') return run(async () => {
+    const r = await api('POST', `/api/admin/practices/${enc}/checkout-link`);
+    state.panels[slug] = { type: 'link', ...r }; toast('Payment link created');
+  });
+  if (act === 'portal') return run(async () => {
+    const r = await api('POST', `/api/admin/practices/${enc}/billing-portal`);
+    state.panels[slug] = { type: 'portal', ...r };
+  });
+  if (act === 'sms') return run(async () => {
+    const r = await api('GET', `/api/admin/sms-registrations/${enc}`);
+    state.panels[slug] = { type: 'sms', registration: r.registration };
+  });
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && state.armed) { state.armed = null; renderPractices(); } });
+$('#secretInput').focus();
+</script>
+</body>
+</html>
