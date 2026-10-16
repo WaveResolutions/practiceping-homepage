@@ -904,14 +904,24 @@ function showCreated(r) {
     <div class="copyrow"><input readonly aria-label="Login URL" value="${esc(loginUrl)}" data-sel><button class="btn small" type="button" data-copy="${esc(loginUrl)}">Copy</button></div>
     <div class="copyrow"><input readonly aria-label="Admin email" value="${esc(r.admin.email)}" data-sel><button class="btn small" type="button" data-copy="${esc(r.admin.email)}">Copy</button></div>
     <div class="copyrow"><input readonly aria-label="Temporary password" value="${esc(r.admin.temporaryPassword)}" data-sel><button class="btn small" type="button" data-copy="${esc(r.admin.temporaryPassword)}">Copy</button></div>
-    <label class="f" for="welcomeMsg" style="margin-top:14px">Welcome message (copy and send it yourself)</label>
-    <textarea id="welcomeMsg" readonly rows="9">${esc(welcome)}</textarea>`;
-  $('#createFoot').innerHTML = `<button class="btn" type="button" data-copy-welcome>Copy welcome message</button><button class="btn primary" type="button" data-close data-go-practices>Done</button>`;
-  $('#createDlg').dataset.welcome = welcome;
+    <label class="f" for="welcomeMsg" style="margin-top:14px">Welcome message to ${esc(r.admin.email)} (edit if needed, then send it here or copy it)</label>
+    <textarea id="welcomeMsg" rows="9">${esc(welcome)}</textarea>`;
+  $('#createFoot').innerHTML = `<button class="btn" type="button" data-copy-welcome>Copy welcome message</button><button class="btn" type="button" data-send-welcome>Send email to client</button><button class="btn primary" type="button" data-close data-go-practices>Done</button>`;
+  $('#createDlg').dataset.slug = r.practice.slug;
+  $('#createDlg').dataset.to = r.admin.email;
+}
+async function sendWelcome(slug, to, message, subject, btn) {
+  const o = btn.textContent; btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await api('POST', `/api/admin/practices/${encodeURIComponent(slug)}/send-welcome`, { email: to, subject, message });
+    toast(`Email sent to ${to}`); btn.textContent = 'Sent ✓';
+  } catch (err) { btn.disabled = false; btn.textContent = o; if (err.message !== 'SESSION_ENDED') toastErr(err); }
 }
 $('#createDlg').addEventListener('click', e => {
   const c = e.target.closest('[data-copy]'); if (c) copyText(c.dataset.copy, c);
-  if (e.target.closest('[data-copy-welcome]')) copyText($('#createDlg').dataset.welcome || '', e.target.closest('[data-copy-welcome]'));
+  if (e.target.closest('[data-copy-welcome]')) copyText($('#welcomeMsg').value, e.target.closest('[data-copy-welcome]'));
+  const sw = e.target.closest('[data-send-welcome]');
+  if (sw) sendWelcome($('#createDlg').dataset.slug, $('#createDlg').dataset.to, $('#welcomeMsg').value, 'Your PracticePing trial is ready', sw);
   if (e.target.closest('[data-go-practices]')) { state.tab = 'practices'; render(); }
   const sel = e.target.closest('[data-sel]'); if (sel) sel.select();
 });
@@ -1039,7 +1049,9 @@ function panelHtml(slug) {
       <div class="warn-box" style="margin-top:0"><strong>Shown once.</strong> Their old password and any open sessions have stopped working. They must choose a new password the next time they sign in.</div>
       <div class="copyrow"><input readonly aria-label="Login URL" value="${esc(url)}" data-sel><button class="btn small" type="button" data-copy="${esc(url)}">Copy</button></div>
       <div class="copyrow"><input readonly aria-label="Temporary password" value="${esc(pn.temporaryPassword)}" data-sel><button class="btn small" type="button" data-copy="${esc(pn.temporaryPassword)}">Copy</button></div>
-      <button class="btn small" type="button" data-copy="${esc(msg)}">Copy message to send</button></div>`;
+      <label class="f" for="rm-${esc(slug)}">Message (edit if needed)</label>
+      <textarea id="rm-${esc(slug)}" rows="8">${esc(msg)}</textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn small" type="button" data-copy-msg="rm-${esc(slug)}">Copy message</button><button class="btn small" type="button" data-send-reset="${esc(slug)}" data-to="${esc(pn.user.email)}">Send email to ${esc(pn.user.email)}</button></div></div>`;
   }
   if (pn.type === 'sms') {
     const reg = pn.registration || {};
@@ -1054,6 +1066,9 @@ const money = c => c ? `$${(c / 100).toFixed(2)}` : 'the plan price';
 $('#practiceList').addEventListener('click', async e => {
   const sel = e.target.closest('[data-sel]'); if (sel) { sel.select(); return; }
   const c = e.target.closest('[data-copy]'); if (c) { copyText(c.dataset.copy, c); return; }
+  const cm = e.target.closest('[data-copy-msg]'); if (cm) { copyText(document.getElementById(cm.dataset.copyMsg).value, cm); return; }
+  const sr = e.target.closest('[data-send-reset]');
+  if (sr) { sendWelcome(sr.dataset.sendReset, sr.dataset.to, document.getElementById('rm-' + sr.dataset.sendReset).value, 'Your PracticePing password was reset', sr); return; }
   const b = e.target.closest('button[data-act]'); if (!b) return;
   const card = b.closest('article'), slug = card.dataset.slug, p = state.practices.find(x => x.slug === slug), act = b.dataset.act;
   if (!p) return;
