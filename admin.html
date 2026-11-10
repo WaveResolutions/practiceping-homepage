@@ -722,7 +722,7 @@ const ACTION_LABELS = {
   'password:change': 'Changed own password', 'password:reset': 'Reset password from link', 'password:reset_requested': 'Asked for a password-reset link',
   'account:setup': 'Finished account setup', 'logout:all': 'Signed out everywhere',
   'admin:invite': 'Invited an admin', 'admin:update': 'Changed an admin', 'admin:link_reset': 'Sent an admin a password link', 'admin:link_new_phone': 'Sent an admin a new-phone link',
-  'practices:create': 'Created a practice', 'practices:edit': 'Edited a practice', 'practices:reset_password': 'Reset a practice user\'s password',
+  'practices:create': 'Created a practice', 'practices:edit': 'Edited a practice', 'practices:reset_mfa': 'Reset a practice admin two-step verification', 'practices:reset_password': 'Reset a practice user\'s password',
   'signups:write': 'Updated a signup',
   'subscription:activate': 'Marked a practice active', 'subscription:extend_trial': 'Extended a trial', 'subscription:reset_trial': 'Restarted a trial', 'subscription:cancel': 'Cancelled a practice',
   'billing:checkout_link': 'Created a payment link', 'billing:portal_link': 'Opened a billing portal link',
@@ -1008,6 +1008,9 @@ function renderPractices() {
     if (can('practices:reset_password')) buttons.push(armed === 'reset'
       ? `<button class="btn navy small" type="button" data-act="reset-go"${dis}>Confirm: reset password</button><button class="btn small ghost" type="button" data-act="disarm">Back</button>`
       : `<button class="btn small" type="button" data-act="reset"${dis}>Reset password</button>`);
+    if (can('practices:reset_password')) buttons.push(armed === 'resetmfa'
+      ? `<button class="btn navy small" type="button" data-act="resetmfa-go"${dis}>Confirm: reset 2-step</button><button class="btn small ghost" type="button" data-act="disarm">Back</button>`
+      : `<button class="btn small" type="button" data-act="resetmfa"${dis}>Reset 2-step</button>`);
     if (can('sms_registration:read')) buttons.push(`<button class="btn small" type="button" data-act="sms"${dis}>SMS registration</button>`);
     if (can('subscription:cancel') && p.subscription_status !== 'cancelled') buttons.push(armed === 'cancel'
       ? `<button class="btn danger armed small" type="button" data-act="cancel-go"${dis}>Confirm: cancel${p.has_subscription ? ' + stop billing' : ''}</button><button class="btn small ghost" type="button" data-act="disarm">Back</button>`
@@ -1079,12 +1082,17 @@ $('#practiceList').addEventListener('click', async e => {
     finally { state.busy.delete(slug); if (ME) { await loadPractices().catch(() => {}); render(); } }
   };
   if (act === 'edit') return openEdit(p);
-  if (act === 'activate' || act === 'cancel' || act === 'reset') { state.armed = { slug, act }; return renderPractices(); }
+  if (act === 'activate' || act === 'cancel' || act === 'reset' || act === 'resetmfa') { state.armed = { slug, act }; return renderPractices(); }
   if (act === 'reset-go') return run(async () => {
     state.armed = null;
     const r = await api('POST', `/api/admin/practices/${enc}/reset-password`, {});
     state.panels[slug] = { type: 'reset', ...r };
     toast('Password reset. Copy it now: it is shown only once.');
+  });
+  if (act === 'resetmfa-go') return run(async () => {
+    state.armed = null;
+    const r = await api('POST', `/api/admin/practices/${enc}/reset-mfa`, {});
+    toast(`Two-step verification reset for ${r.user.email}. They sign in with their password and set it up again.`);
   });
   if (act === 'disarm') { state.armed = null; return renderPractices(); }
   if (act === 'activate-go') { state.armed = null; return run(async () => { await api('POST', '/api/admin/subscription', { slug, action: 'activate' }); toast(`${p.name} marked active`); }); }
